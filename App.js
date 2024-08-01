@@ -1,6 +1,8 @@
-import { Text, View } from 'react-native';
+import { View } from 'react-native';
 import { useEffect, useState } from 'react';
 import useFonts from './hooks/useFonts';
+
+import NavigationBar from './components/NavigationBar';
 
 export default function App() {
   const [isLoading, setIsLoading] = useState(true);
@@ -22,7 +24,7 @@ export default function App() {
       {isLoading ? (
         <View />
       ) : (
-        <Text>Init</Text>
+        <NavigationBar />
       )}
     </>
   );
