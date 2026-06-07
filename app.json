@@ -1,0 +1,26 @@
+{
+  "expo": {
+    "name": "Bleedr",
+    "slug": "bleedr",
+    "version": "0.0.1",
+    "orientation": "portrait",
+    "icon": "./assets/images/icon.png",
+    "userInterfaceStyle": "dark",
+    "newArchEnabled": true,
+    "splash": {
+      "image": "./assets/images/splash.png",
+      "resizeMode": "contain",
+      "backgroundColor": "#FAF9F6"
+    },
+    "android": {
+      "adaptiveIcon": {
+        "foregroundImage": "./assets/images/icon.png",
+        "backgroundColor": "#FAF9F6"
+      }
+    },
+    "plugins": [
+      "expo-localization",
+      "expo-font"
+    ]
+  }
+}
