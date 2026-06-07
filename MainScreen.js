@@ -5,6 +5,7 @@ import { StatusBar } from 'expo-status-bar';
 import BottomTabBar from './components/BottomTabBar';
 import FaqScreen from './screens/FaqScreen';
 import HomeScreen from './screens/HomeScreen';
+import OnboardingScreen from './screens/OnboardingScreen';
 import SettingsScreen from './screens/SettingsScreen';
 
 import { useSettings } from './SettingsProvider';
@@ -34,10 +35,16 @@ export default function MainScreen() {
     return (
         <View style={styles.app}>
             <StatusBar style={settings.theme === 'dark' ? 'light' : 'dark'} />
-            <View style={styles.content}>
-                <ActiveScreen />
-            </View>
-            <BottomTabBar activeTab={activeTab} onChange={setActiveTab} />
+            {!settings.hasCompletedOnboarding ? (
+                <OnboardingScreen />
+            ) : (
+                <>
+                    <View style={styles.content}>
+                        <ActiveScreen />
+                    </View>
+                    <BottomTabBar activeTab={activeTab} onChange={setActiveTab} />
+                </>
+            )}
         </View>
     )
 }

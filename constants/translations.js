@@ -3,7 +3,7 @@ export const translations = {
         faqTitle: 'FAQ',
         faqItems: [
             {
-                question: 'Blood group compatibility table',
+                question: 'Which blood groups are compatible with mine?',
                 answer: [
                     'For red blood cell donation, compatibility is mostly about ABO and RhD. O- is the universal red cell donor, while AB+ can receive red cells from every listed group.',
                     'Donor -> recipients: O- -> all groups; O+ -> O+, A+, B+, AB+; A- -> A-, A+, AB-, AB+; A+ -> A+, AB+; B- -> B-, B+, AB-, AB+; B+ -> B+, AB+; AB- -> AB-, AB+; AB+ -> AB+.',
@@ -11,7 +11,7 @@ export const translations = {
                 ]
             },
             {
-                question: 'Contraindications to donating blood',
+                question: 'What are the contraindications to donating blood?',
                 answer: [
                     'In Poland, a donor should usually be healthy, 18-65 years old and weigh at least 50 kg. Do not donate when you have cold symptoms, fever, active infection, feel unwell or are currently taking medication that may affect eligibility.',
                     'Temporary deferrals may apply after aspirin, dental procedures, antibiotics, tattoos, piercings, surgery, endoscopy, blood transfusion or risky exposure. Some conditions and infections can permanently disqualify a donor.',
@@ -19,7 +19,7 @@ export const translations = {
                 ]
             },
             {
-                question: 'Blood donation limits and restrictions',
+                question: 'What are the limits and restrictions for blood donation?',
                 answer: [
                     'Whole blood can be donated up to 4 times per year by women and up to 6 times per year by men, with at least 8 weeks between donations.',
                     'Plasma, platelets and red cell apheresis have separate limits and intervals. For example, platelet donations are usually limited to 12 times per year with at least 4 weeks between procedures.',
@@ -35,7 +35,7 @@ export const translations = {
                 ]
             },
             {
-                question: 'Benefits of donating blood',
+                question: 'What are the benefits of donating blood?',
                 answer: [
                     'The most important benefit is real help for patients: blood cannot be manufactured, and one standard whole blood donation can help up to three people.',
                     'Donors can receive a regenerative meal, confirmation documents, reimbursement of travel costs under applicable rules, basic test information and, in Poland, tax relief for blood donation.',
@@ -43,7 +43,7 @@ export const translations = {
                 ]
             },
             {
-                question: 'Blood donation myths',
+                question: 'What are the myths about blood donation?',
                 answer: [
                     'You do not need to know your blood type before your first donation; it can be determined during the process.',
                     'Donation does not make the body produce unnecessary extra blood forever and it does not create an obligation to donate again.',
@@ -59,24 +59,29 @@ export const translations = {
                 ]
             }
         ],
-        homeGreetings: [
-            'Good to see you, donor.',
-            'Every donation counts.',
-            'Track your impact with Bleedr.',
-            'Ready for your next good deed?',
-            'Your blood can mean another chance.'
-        ],
-        homeGreetingFallback: 'Welcome back.',
+        homeDonationPrompt: 'Donated blood? Press the button above!',
         homeBloodType: 'Blood type',
         homeTotalDonated: 'Total donated',
-        homeNextDonation: 'Next eligible date',
+        homeNextDonation: 'Next eligible donation date',
         homeDonationHistory: 'Donation history',
+        homeDonationHistoryEmpty: 'No donations saved yet.',
         homeNearbyCenters: 'Nearby blood donation centers',
         homeYourLocation: 'Your location',
         homeNotProvided: 'N/A',
         showAllDonations: 'See all',
         allDonationsTitle: 'All donations',
         back: 'Back',
+        donationFormTitle: 'New donation',
+        donationFormIntro: 'Save the place and date of your donation. Bleedr will add 450 ml to your total and estimate the next eligible date.',
+        donationPlace: 'Donation place',
+        donationPlacePlaceholder: 'e.g. RCKiK Warsaw',
+        donationPlaceFallback: 'Blood donation center',
+        donationDate: 'Donation date',
+        donationDatePlaceholder: 'YYYY-MM-DD',
+        donationSave: 'Save donation',
+        onboardingTitle: 'Welcome to Bleedr',
+        onboardingSubtitle: 'Fill in your donor details now. You can leave fields empty and update them later in settings.',
+        onboardingFinish: 'Save and start',
         settingsTitle: 'Settings',
         settingsPatientSection: 'Patient information',
         settingsPatientPrivacy: 'These details help Bleedr estimate donation eligibility, personalize reminders and show more useful context in the app. The data is optional, anonymous and stored only locally on this device. It is not sent to any server.',
@@ -86,7 +91,6 @@ export const translations = {
         settingsPatientSex: 'Sex',
         settingsPatientSexFemale: 'Female',
         settingsPatientSexMale: 'Male',
-        settingsPatientSexOther: 'Other',
         settingsPatientWeight: 'Body weight (kg)',
         settingsPatientWeightPlaceholder: 'e.g. 72',
         settingsPatientCity: 'City',
@@ -117,7 +121,7 @@ export const translations = {
         faqTitle: 'FAQ',
         faqItems: [
             {
-                question: 'Tabela kompatybilności grup krwi',
+                question: 'Z jakimi grupami krwi kompatybilna jest moja grupa?',
                 answer: [
                     'Dla przetaczania krwinek czerwonych najczęściej patrzy się na układ ABO i RhD. 0- jest uniwersalnym dawcą krwinek czerwonych, a AB+ może przyjąć krwinki czerwone od każdej z wymienionych grup.',
                     'Dawca -> biorcy: 0- -> wszystkie grupy; 0+ -> 0+, A+, B+, AB+; A- -> A-, A+, AB-, AB+; A+ -> A+, AB+; B- -> B-, B+, AB-, AB+; B+ -> B+, AB+; AB- -> AB-, AB+; AB+ -> AB+.',
@@ -125,7 +129,7 @@ export const translations = {
                 ]
             },
             {
-                question: 'Przeciwwskazania do oddania krwi',
+                question: 'Jakie są przeciwwskazania do oddania krwi?',
                 answer: [
                     'W Polsce dawcą zwykle może być osoba zdrowa, w wieku 18-65 lat i o masie ciała co najmniej 50 kg. Nie zgłaszaj się z objawami infekcji, gorączką, złym samopoczuciem ani podczas przyjmowania leków, które mogą wpływać na kwalifikację.',
                     'Czasowa dyskwalifikacja może dotyczyć m.in. przyjęcia aspiryny, zabiegów stomatologicznych, antybiotyków, tatuażu, piercingu, operacji, endoskopii, przetoczenia krwi lub ryzykownej ekspozycji. Część chorób i zakażeń może wykluczać oddawanie krwi na stałe.',
@@ -133,7 +137,7 @@ export const translations = {
                 ]
             },
             {
-                question: 'Oddawanie krwi - limity i restrykcje',
+                question: 'Jakie są limity i restrykcje oddawania krwi?',
                 answer: [
                     'Krew pełną można oddać maksymalnie 4 razy w roku w przypadku kobiet i 6 razy w roku w przypadku mężczyzn, z przerwą co najmniej 8 tygodni między donacjami.',
                     'Osocze, płytki krwi i koncentrat krwinek czerwonych mają osobne limity oraz odstępy. Przykładowo płytki krwi oddaje się zwykle maksymalnie 12 razy w roku, z przerwą co najmniej 4 tygodni.',
@@ -149,7 +153,7 @@ export const translations = {
                 ]
             },
             {
-                question: 'Benefity oddawania krwi',
+                question: 'Jakie są benefity oddawania krwi?',
                 answer: [
                     'Najważniejszy benefit to realna pomoc pacjentom: krwi nie da się wyprodukować, a jedna standardowa donacja krwi pełnej może pomóc nawet trzem osobom.',
                     'Dawcy przysługuje m.in. posiłek regeneracyjny, zaświadczenia, zwrot kosztów przejazdu według obowiązujących zasad, dostęp do podstawowych informacji o badaniach oraz możliwość skorzystania z ulgi podatkowej.',
@@ -157,7 +161,7 @@ export const translations = {
                 ]
             },
             {
-                question: 'Mity na temat krwiodawstwa',
+                question: 'Jakie są mity na temat krwiodawstwa?',
                 answer: [
                     'Nie musisz znać swojej grupy krwi przed pierwszą donacją; może zostać oznaczona w trakcie procedury.',
                     'Oddanie krwi nie sprawia, że organizm zaczyna produkować niepotrzebny nadmiar krwi na stałe i nie zobowiązuje do kolejnych donacji.',
@@ -173,34 +177,38 @@ export const translations = {
                 ]
             }
         ],
-        homeGreetings: [
-            'Dobrze Cię widzieć, dawco.',
-            'Każda donacja ma znaczenie.',
-            'Śledź swój wpływ z Bleedr.',
-            'Gotów na kolejny dobry gest?',
-            'Twoja krew może dać komuś kolejną szansę.'
-        ],
-        homeGreetingFallback: 'Witaj ponownie.',
+        homeDonationPrompt: 'Oddałeś krew? Wciśnij przycisk u góry!',
         homeBloodType: 'Grupa krwi',
         homeTotalDonated: 'Oddano łącznie',
-        homeNextDonation: 'Najbliższy możliwy termin',
+        homeNextDonation: 'Najbliższy możliwy termin oddania krwi',
         homeDonationHistory: 'Historia donacji',
+        homeDonationHistoryEmpty: 'Nie zapisano jeszcze żadnej donacji.',
         homeNearbyCenters: 'Centra krwiodawstwa w pobliżu',
         homeYourLocation: 'Twoja lokalizacja',
         homeNotProvided: 'B/D',
         showAllDonations: 'Zobacz wszystkie',
         allDonationsTitle: 'Wszystkie donacje',
         back: 'Wróć',
+        donationFormTitle: 'Nowa donacja',
+        donationFormIntro: 'Zapisz miejsce i datę donacji. Bleedr doda 450 ml do Twojego wyniku i wyliczy najbliższy możliwy termin kolejnego oddania.',
+        donationPlace: 'Miejsce donacji',
+        donationPlacePlaceholder: 'np. RCKiK Warszawa',
+        donationPlaceFallback: 'Centrum krwiodawstwa',
+        donationDate: 'Data donacji',
+        donationDatePlaceholder: 'RRRR-MM-DD',
+        donationSave: 'Zapisz donację',
+        onboardingTitle: 'Witaj w Bleedr',
+        onboardingSubtitle: 'Uzupełnij dane dawcy. Możesz zostawić pola puste i wrócić do nich później w ustawieniach.',
+        onboardingFinish: 'Zapisz i rozpocznij',
         settingsTitle: 'Ustawienia',
         settingsPatientSection: 'Informacje o pacjencie',
-        settingsPatientPrivacy: 'Te dane pomagają Bleedr szacować możliwość oddania krwi, personalizować przypomnienia i pokazywać bardziej użyteczny kontekst w aplikacji. Podanie danych jest dobrowolne, anonimowe i są one przechowywane wyłącznie lokalnie na tym urządzeniu. Nie są wysyłane na żaden serwer.',
+        settingsPatientPrivacy: 'Te dane pomagają Bleedr szacować możliwość oddania krwi, personalizować przypomnienia i pokazywać bardziej użyteczny kontekst w aplikacji. Ich podanie jest dobrowolne i anonimowe. Dane są przechowywane wyłącznie lokalnie na twoim urządzeniu i nie są wysyłane na żaden serwer.',
         settingsPatientBloodType: 'Grupa krwi',
         settingsPatientAge: 'Wiek',
         settingsPatientAgePlaceholder: 'np. 28',
         settingsPatientSex: 'Płeć',
         settingsPatientSexFemale: 'Kobieta',
         settingsPatientSexMale: 'Mężczyzna',
-        settingsPatientSexOther: 'Inna',
         settingsPatientWeight: 'Masa ciała (kg)',
         settingsPatientWeightPlaceholder: 'np. 72',
         settingsPatientCity: 'Miasto',

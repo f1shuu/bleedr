@@ -1,31 +1,4 @@
-export const userStats = {
-    bloodType: null,
-    totalDonatedMl: 1350,
-    nextDonationDate: '2026-07-24'
-};
-
-export const donationHistory = [
-    {
-        id: 'donation-1',
-        date: '2026-05-29',
-        place: 'RCKiK Warszawa'
-    },
-    {
-        id: 'donation-2',
-        date: '2026-03-21',
-        place: 'Terenowa akcja poboru krwi'
-    },
-    {
-        id: 'donation-3',
-        date: '2026-01-17',
-        place: 'RCKiK Warszawa'
-    },
-    {
-        id: 'donation-4',
-        date: '2025-11-08',
-        place: 'RCKiK Warszawa'
-    }
-];
+export const wholeBloodDonationMl = 450;
 
 export const fallbackDonationCenters = [
     {

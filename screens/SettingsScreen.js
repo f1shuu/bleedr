@@ -1,18 +1,13 @@
 import { useState } from 'react';
-import { ScrollView, Text, TextInput, TouchableOpacity, View } from 'react-native';
+import { ScrollView, Text, TouchableOpacity, View } from 'react-native';
 
 import Container from '../components/Container';
 import Modal from '../components/Modal';
+import PatientInfoForm from '../components/PatientInfoForm';
 import appConfig from '../app.json';
 
 import { useSettings } from '../SettingsProvider';
 
-const bloodTypeOptions = ['0-', '0+', 'A-', 'A+', 'B-', 'B+', 'AB-', 'AB+'];
-const sexOptions = [
-    { value: 'female', labelKey: 'settingsPatientSexFemale' },
-    { value: 'male', labelKey: 'settingsPatientSexMale' },
-    { value: 'other', labelKey: 'settingsPatientSexOther' }
-];
 const themeOptions = [
     { value: 'dark', labelKey: 'settingsThemeDark' },
     { value: 'light', labelKey: 'settingsThemeLight' }
@@ -85,15 +80,6 @@ export default function SettingsScreen() {
             color: getColor('muted'),
             marginBottom: 8
         },
-        input: {
-            minHeight: 48,
-            borderColor: getColor('border'),
-            borderWidth: 1,
-            borderRadius: 8,
-            paddingHorizontal: 14,
-            color: getColor('text'),
-            fontSize: 15
-        },
         optionRow: {
             flexDirection: 'row',
             flexWrap: 'wrap',
@@ -127,7 +113,6 @@ export default function SettingsScreen() {
             textAlign: 'center'
         },
         version: {
-            fontFamily: 'KGRedHands',
             fontSize: 10,
             lineHeight: 16,
             color: getColor('muted'),
@@ -164,21 +149,6 @@ export default function SettingsScreen() {
         );
     };
 
-    const renderField = ({ key, labelKey, keyboardType = 'default', placeholderKey }) => (
-        <View style={styles.field}>
-            <Text style={styles.label}>{translate(labelKey)}</Text>
-            <TextInput
-                keyboardType={keyboardType}
-                onChangeText={(value) => updatePatientInfo(key, value)}
-                placeholder={translate(placeholderKey)}
-                placeholderTextColor={getColor('muted')}
-                selectionColor={getColor('secondary')}
-                style={styles.input}
-                value={patientInfo[key] || ''}
-            />
-        </View>
-    );
-
     return (
         <Container additionalStyle={styles.screen}>
             <ScrollView
@@ -193,53 +163,10 @@ export default function SettingsScreen() {
                         <Text style={styles.infoText}>{translate('settingsPatientPrivacy')}</Text>
                     </View>
 
-                    <View style={styles.field}>
-                        <Text style={styles.label}>{translate('settingsPatientBloodType')}</Text>
-                        <View style={styles.optionRow}>
-                            {bloodTypeOptions.map((bloodType) => (
-                                renderOption(
-                                    { value: bloodType, label: bloodType },
-                                    patientInfo.bloodType,
-                                    (value) => updatePatientInfo('bloodType', value)
-                                )
-                            ))}
-                        </View>
-                    </View>
-
-                    {renderField({
-                        key: 'age',
-                        labelKey: 'settingsPatientAge',
-                        keyboardType: 'numeric',
-                        placeholderKey: 'settingsPatientAgePlaceholder'
-                    })}
-
-                    <View style={styles.field}>
-                        <Text style={styles.label}>{translate('settingsPatientSex')}</Text>
-                        <View style={styles.optionRow}>
-                            {sexOptions.map((option) => (
-                                renderOption(option, patientInfo.sex, (value) => updatePatientInfo('sex', value))
-                            ))}
-                        </View>
-                    </View>
-
-                    {renderField({
-                        key: 'weightKg',
-                        labelKey: 'settingsPatientWeight',
-                        keyboardType: 'numeric',
-                        placeholderKey: 'settingsPatientWeightPlaceholder'
-                    })}
-
-                    {renderField({
-                        key: 'city',
-                        labelKey: 'settingsPatientCity',
-                        placeholderKey: 'settingsPatientCityPlaceholder'
-                    })}
-
-                    {renderField({
-                        key: 'preferredCenter',
-                        labelKey: 'settingsPatientPreferredCenter',
-                        placeholderKey: 'settingsPatientPreferredCenterPlaceholder'
-                    })}
+                    <PatientInfoForm
+                        patientInfo={patientInfo}
+                        onChange={updatePatientInfo}
+                    />
                 </View>
 
                 <View style={styles.section}>

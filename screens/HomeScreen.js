@@ -4,9 +4,16 @@ import * as Location from 'expo-location';
 import MapView, { Marker } from 'react-native-maps';
 
 import Container from '../components/Container';
-import { donationHistory, fallbackDonationCenters, userStats } from '../constants/homeMockData';
+import { fallbackDonationCenters } from '../constants/homeMockData';
+import DonationFormScreen from './DonationFormScreen';
 import DonationHistoryScreen from './DonationHistoryScreen';
 import { searchNearbyDonationCenters } from '../services/places';
+import {
+    calculateNextDonationDate,
+    getSortedDonations,
+    getTotalDonatedMl,
+    parseDateInputValue
+} from '../utils/donations';
 
 import { useSettings } from '../SettingsProvider';
 
@@ -22,7 +29,7 @@ const formatDate = (date, language) => (
         day: '2-digit',
         month: 'short',
         year: 'numeric'
-    }).format(new Date(date))
+    }).format(typeof date === 'string' ? parseDateInputValue(date) : date)
 );
 
 const formatDonationVolume = (milliliters, language) => (
@@ -35,6 +42,7 @@ export default function HomeScreen() {
     const [centers, setCenters] = useState(fallbackDonationCenters);
     const [placesStatus, setPlacesStatus] = useState('idle');
     const [isLoadingPlaces, setIsLoadingPlaces] = useState(false);
+    const [isDonationFormOpen, setIsDonationFormOpen] = useState(false);
     const [isHistoryOpen, setIsHistoryOpen] = useState(false);
 
     useEffect(() => {
@@ -107,20 +115,17 @@ export default function HomeScreen() {
     }, [centers, userLocation]);
 
     const statusText = translate(`placesStatus.${placesStatus}`);
-    const bloodType = settings.patientInfo?.bloodType || userStats.bloodType || translate('homeNotProvided');
-    const homeGreeting = useMemo(() => {
-        const greetings = translate('homeGreetings');
-        const greetingOptions = Array.isArray(greetings) ? greetings : [translate('homeGreetingFallback')];
-
-        return greetingOptions[Math.floor(Math.random() * greetingOptions.length)];
-    }, [translate]);
+    const bloodType = settings.patientInfo?.bloodType || translate('homeNotProvided');
     const sortedDonationHistory = useMemo(() => (
-        [...donationHistory].sort((firstDonation, secondDonation) => (
-            new Date(secondDonation.date) - new Date(firstDonation.date)
-        ))
-    ), []);
+        getSortedDonations(settings.donations || [])
+    ), [settings.donations]);
     const recentDonationHistory = sortedDonationHistory.slice(0, 3);
     const hasMoreDonationHistory = sortedDonationHistory.length > recentDonationHistory.length;
+    const totalDonatedMl = getTotalDonatedMl(sortedDonationHistory);
+    const nextDonationDate = calculateNextDonationDate(
+        sortedDonationHistory,
+        settings.patientInfo?.sex
+    );
 
     if (isHistoryOpen) {
         return (
@@ -128,6 +133,12 @@ export default function HomeScreen() {
                 donations={sortedDonationHistory}
                 onBack={() => setIsHistoryOpen(false)}
             />
+        );
+    }
+
+    if (isDonationFormOpen) {
+        return (
+            <DonationFormScreen onBack={() => setIsDonationFormOpen(false)} />
         );
     }
 
@@ -144,9 +155,9 @@ export default function HomeScreen() {
             marginBottom: 64
         },
         logo: {
-            width: 118,
-            height: 118,
-            borderRadius: 8,
+            width: 140,
+            height: 140,
+            borderRadius: 70,
             marginBottom: 14
         },
         greeting: {
@@ -273,12 +284,19 @@ export default function HomeScreen() {
                 showsVerticalScrollIndicator={false}
             >
                 <View style={styles.hero}>
-                    <Image
-                        source={require('../assets/images/icon.png')}
-                        resizeMode='contain'
-                        style={styles.logo}
-                    />
-                    <Text style={styles.greeting}>{homeGreeting}</Text>
+                    <TouchableOpacity
+                        accessibilityLabel={translate('donationFormTitle')}
+                        accessibilityRole='button'
+                        activeOpacity={0.8}
+                        onPress={() => setIsDonationFormOpen(true)}
+                    >
+                        <Image
+                            source={require('../assets/images/icon.png')}
+                            resizeMode='contain'
+                            style={styles.logo}
+                        />
+                    </TouchableOpacity>
+                    <Text style={styles.greeting}>{translate('homeDonationPrompt')}</Text>
                 </View>
 
                 <View style={styles.grid}>
@@ -289,27 +307,33 @@ export default function HomeScreen() {
                     <View style={styles.statCard}>
                         <Text style={styles.statLabel}>{translate('homeTotalDonated')}</Text>
                         <Text numberOfLines={1} style={styles.statValue}>
-                            {formatDonationVolume(userStats.totalDonatedMl, settings.language)}
+                            {formatDonationVolume(totalDonatedMl, settings.language)}
                         </Text>
                     </View>
                     <View style={styles.statCard}>
                         <Text style={styles.statLabel}>{translate('homeNextDonation')}</Text>
                         <Text numberOfLines={1} style={styles.statValue}>
-                            {formatDate(userStats.nextDonationDate, settings.language)}
+                            {nextDonationDate
+                                ? formatDate(nextDonationDate, settings.language)
+                                : translate('homeNotProvided')}
                         </Text>
                     </View>
                 </View>
 
                 <View style={styles.section}>
                     <Text style={styles.sectionTitle}>{translate('homeDonationHistory')}</Text>
-                    {recentDonationHistory.map((donation) => (
-                        <View key={donation.id} style={styles.historyItem}>
-                            <Text style={styles.historyDate}>
-                                {formatDate(donation.date, settings.language)}
-                            </Text>
-                            <Text style={styles.historyPlace}>{donation.place}</Text>
-                        </View>
-                    ))}
+                    {recentDonationHistory.length === 0 ? (
+                        <Text style={styles.historyPlace}>{translate('homeDonationHistoryEmpty')}</Text>
+                    ) : (
+                        recentDonationHistory.map((donation) => (
+                            <View key={donation.id} style={styles.historyItem}>
+                                <Text style={styles.historyDate}>
+                                    {formatDate(donation.date, settings.language)}
+                                </Text>
+                                <Text style={styles.historyPlace}>{donation.place}</Text>
+                            </View>
+                        ))
+                    )}
                     {hasMoreDonationHistory && (
                         <TouchableOpacity
                             activeOpacity={0.8}

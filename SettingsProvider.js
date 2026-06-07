@@ -16,6 +16,7 @@ const DEFAULT_PATIENT_INFO = {
     city: '',
     preferredCenter: ''
 };
+const ALLOWED_SEXES = ['female', 'male'];
 
 const getSupportedLanguage = (languageCode) => (
     translations[languageCode] ? languageCode : DEFAULT_LANGUAGE
@@ -29,22 +30,33 @@ export default function SettingsProvider({ children }) {
     const defaultSettings = useMemo(() => ({
         language: getSupportedLanguage(Localization.getLocales()[0]?.languageCode),
         theme: DEFAULT_THEME,
+        hasCompletedOnboarding: false,
         patientInfo: DEFAULT_PATIENT_INFO,
+        donations: [],
         defaultLogin: null
     }), []);
 
     const [settings, setSettings] = useState(defaultSettings);
 
-    const normalizeSettings = useCallback((savedSettings = {}) => ({
-        ...defaultSettings,
-        ...savedSettings,
-        patientInfo: {
+    const normalizeSettings = useCallback((savedSettings = {}) => {
+        const patientInfo = {
             ...defaultSettings.patientInfo,
             ...(savedSettings.patientInfo || {})
-        },
-        language: getSupportedLanguage(savedSettings.language || defaultSettings.language),
-        theme: themes[savedSettings.theme] ? savedSettings.theme : defaultSettings.theme
-    }), [defaultSettings]);
+        };
+
+        return {
+            ...defaultSettings,
+            ...savedSettings,
+            patientInfo: {
+                ...patientInfo,
+                sex: ALLOWED_SEXES.includes(patientInfo.sex) ? patientInfo.sex : ''
+            },
+            donations: Array.isArray(savedSettings.donations) ? savedSettings.donations : defaultSettings.donations,
+            hasCompletedOnboarding: savedSettings.hasCompletedOnboarding === true,
+            language: getSupportedLanguage(savedSettings.language || defaultSettings.language),
+            theme: themes[savedSettings.theme] ? savedSettings.theme : defaultSettings.theme
+        };
+    }, [defaultSettings]);
 
     const loadSettings = useCallback(async () => {
         try {
