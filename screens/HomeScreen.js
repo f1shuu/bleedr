@@ -107,7 +107,7 @@ export default function HomeScreen() {
     }, [centers, userLocation]);
 
     const statusText = translate(`placesStatus.${placesStatus}`);
-    const bloodType = userStats.bloodType || translate('homeNotProvided');
+    const bloodType = settings.patientInfo?.bloodType || userStats.bloodType || translate('homeNotProvided');
     const homeGreeting = useMemo(() => {
         const greetings = translate('homeGreetings');
         const greetingOptions = Array.isArray(greetings) ? greetings : [translate('homeGreetingFallback')];

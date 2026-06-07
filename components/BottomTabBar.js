@@ -20,7 +20,7 @@ export default function BottomTabBar({ activeTab, onChange }) {
         },
         tabBar: {
             flexDirection: 'row',
-            height: 60
+            height: 70
         },
         tab: {
             flex: 1,
