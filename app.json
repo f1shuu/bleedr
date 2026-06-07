@@ -20,7 +20,13 @@
     },
     "plugins": [
       "expo-localization",
-      "expo-font"
+      "expo-font",
+      [
+        "expo-location",
+        {
+          "locationWhenInUsePermission": "Bleedr używa lokalizacji, aby pokazać pobliskie centra krwiodawstwa."
+        }
+      ]
     ]
   }
 }

@@ -59,6 +59,31 @@ export const translations = {
                 ]
             }
         ],
+        homeGreetings: [
+            'Good to see you, donor.',
+            'Every donation counts.',
+            'Track your impact with Bleedr.',
+            'Ready for your next good deed?',
+            'Your blood can mean another chance.'
+        ],
+        homeGreetingFallback: 'Welcome back.',
+        homeBloodType: 'Blood type',
+        homeTotalDonated: 'Total donated',
+        homeNextDonation: 'Next eligible date',
+        homeDonationHistory: 'Donation history',
+        homeNearbyCenters: 'Nearby blood donation centers',
+        homeYourLocation: 'Your location',
+        homeNotProvided: 'N/A',
+        showAllDonations: 'See all',
+        allDonationsTitle: 'All donations',
+        back: 'Back',
+        placesStatus: {
+            idle: 'Map uses sample centers until your location and Google Places are available.',
+            ready: 'Nearby centers loaded from Google Places.',
+            'missing-api-key': 'Add EXPO_PUBLIC_GOOGLE_PLACES_API_KEY to enable Google Places results. Showing sample centers for now.',
+            'location-denied': 'Location permission was not granted. Showing sample centers for now.',
+            error: 'Could not load Google Places results. Showing sample centers for now.'
+        },
         tabFaq: 'FAQ',
         tabHome: 'Home',
         tabSettings: 'Settings'
@@ -123,8 +148,33 @@ export const translations = {
                 ]
             }
         ],
+        homeGreetings: [
+            'Dobrze Cię widzieć, dawco.',
+            'Każda donacja ma znaczenie.',
+            'Śledź swój wpływ z Bleedr.',
+            'Gotów na kolejny dobry gest?',
+            'Twoja krew może dać komuś kolejną szansę.'
+        ],
+        homeGreetingFallback: 'Witaj ponownie.',
+        homeBloodType: 'Grupa krwi',
+        homeTotalDonated: 'Oddano łącznie',
+        homeNextDonation: 'Najbliższy możliwy termin',
+        homeDonationHistory: 'Historia donacji',
+        homeNearbyCenters: 'Centra krwiodawstwa w pobliżu',
+        homeYourLocation: 'Twoja lokalizacja',
+        homeNotProvided: 'B/D',
+        showAllDonations: 'Zobacz wszystkie',
+        allDonationsTitle: 'Wszystkie donacje',
+        back: 'Wróć',
+        placesStatus: {
+            idle: 'Mapa pokazuje przykładowe centra, dopóki lokalizacja i Google Places nie będą dostępne.',
+            ready: 'Pobliskie centra wczytane z Google Places.',
+            'missing-api-key': 'Dodaj EXPO_PUBLIC_GOOGLE_PLACES_API_KEY, aby włączyć wyniki Google Places. Na razie pokazuję przykładowe centra.',
+            'location-denied': 'Nie przyznano dostępu do lokalizacji. Na razie pokazuję przykładowe centra.',
+            error: 'Nie udało się wczytać wyników Google Places. Na razie pokazuję przykładowe centra.'
+        },
         tabFaq: 'FAQ',
-        tabHome: 'Główna',
+        tabHome: 'Panel',
         tabSettings: 'Ustawienia'
     }
 }
