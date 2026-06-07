@@ -1,8 +1,6 @@
 import { SafeAreaView, Text, TouchableOpacity, View } from 'react-native';
 import { FontAwesome6 } from '@expo/vector-icons';
 
-import colors from '../constants/colors';
-
 import { useSettings } from '../SettingsProvider';
 
 const tabs = [
@@ -17,7 +15,7 @@ export default function BottomTabBar({ activeTab, onChange }) {
     const styles = {
         safeArea: {
             backgroundColor: getColor('primary'),
-            borderTopColor: colors.placeholder,
+            borderTopColor: getColor('border'),
             borderTopWidth: 1
         },
         tabBar: {
@@ -55,12 +53,12 @@ export default function BottomTabBar({ activeTab, onChange }) {
                             <FontAwesome6
                                 name={tab.icon}
                                 size={22}
-                                color={isActive ? getColor('secondary') : colors.placeholder}
+                                color={isActive ? getColor('secondary') : getColor('muted')}
                             />
                             <Text
                                 style={[
                                     styles.label,
-                                    { color: isActive ? getColor('secondary') : colors.placeholder }
+                                    { color: isActive ? getColor('secondary') : getColor('muted') }
                                 ]}
                             >
                                 {translate(tab.labelKey)}
