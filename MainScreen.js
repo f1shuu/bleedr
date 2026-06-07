@@ -1,77 +1,43 @@
 import { useState } from 'react';
-import { Text, View } from 'react-native';
+import { View } from 'react-native';
 import { StatusBar } from 'expo-status-bar';
 
-import Button from './components/Button';
-import Container from './components/Container';
-import Dropdown from './components/Dropdown';
-import Modal from './components/Modal';
-import SegmentedButton from './components/SegmentedButton';
+import BottomTabBar from './components/BottomTabBar';
+import FaqScreen from './screens/FaqScreen';
+import HomeScreen from './screens/HomeScreen';
+import SettingsScreen from './screens/SettingsScreen';
 
 import { useSettings } from './SettingsProvider';
 
+const TABS = {
+    faq: FaqScreen,
+    home: HomeScreen,
+    settings: SettingsScreen
+};
+
 export default function MainScreen() {
-    const [isFocus, setIsFocus] = useState(false);
-    const [example, setExample] = useState(null);
-    const [isModalVisible, setIsModalVisible] = useState(false);
+    const [activeTab, setActiveTab] = useState('home');
+    const { getColor, settings } = useSettings();
 
-    const { getColor, translate } = useSettings();
-
-    const optionOne = translate('option') + ' 1';
-    const optionTwo = translate('option') + ' 2';
-    const [option, setOption] = useState(optionOne);
-
-    const sampleData = [
-        { value: optionOne },
-        { value: optionTwo },
-        { value: translate('option') + ' 3' }
-    ]
+    const ActiveScreen = TABS[activeTab] || HomeScreen;
 
     const styles = {
-        container: {
-            alignItems: 'center',
-            justifyContent: 'center',
-            gap: 20
+        app: {
+            flex: 1,
+            backgroundColor: getColor('primary')
         },
-        text: {
-            fontFamily: 'KGRedHands',
-            fontSize: 20,
-            color: getColor('secondary'),
-            textAlign: 'center'
+        content: {
+            flex: 1
         }
-    }
+    };
 
     return (
-        <Container additionalStyle={styles.container}>
-            <StatusBar style='auto' />
-            <Text style={styles.text}>{translate('sampleFontText')}</Text>
-            <View style={{ flexDirection: 'row' }}>
-                <Button onPress={() => setIsModalVisible(() => !isModalVisible)} text={translate('normalButton')} />
-                <Button onPress={() => { }} text={translate('deleteButton')} type='delete' />
-            </View >
-            <Dropdown
-                data={sampleData}
-                placeholder={isFocus ? '...' : translate('choose') + '...'}
-                value={example}
-                onFocus={() => setIsFocus(true)}
-                onBlur={() => setIsFocus(false)}
-                onChange={setExample}>
-            </Dropdown>
-            <Modal
-                isVisible={isModalVisible}
-                text={translate('sampleModalText')}
-                twoButtons={true}
-                buttonOneText={translate('ok')}
-                buttonTwoText={translate('cancel')}
-                buttonOneOnPress={() => setIsModalVisible(() => !isModalVisible)}
-                buttonTwoOnPress={() => setIsModalVisible(() => !isModalVisible)}
-            />
-            <SegmentedButton
-                option1={optionOne}
-                option2={optionTwo}
-                onOptionChange={setOption}
-                selectedOption={option}
-            />
-        </Container>
+        <View style={styles.app}>
+            <StatusBar style={settings.theme === 'dark' ? 'light' : 'dark'} />
+            <View style={styles.content}>
+                <ActiveScreen />
+            </View>
+            <BottomTabBar activeTab={activeTab} onChange={setActiveTab} />
+        </View>
     )
 }
