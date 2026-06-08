@@ -3,12 +3,17 @@ import { ActivityIndicator, Image, ScrollView, Text, TouchableOpacity, View } fr
 import * as Location from 'expo-location';
 import MapView, { Marker } from 'react-native-maps';
 
+import AchievementItem from '../components/AchievementItem';
+import AchievementToast from '../components/AchievementToast';
 import Container from '../components/Container';
 import DonationHistoryItem from '../components/DonationHistoryItem';
 import Modal from '../components/Modal';
+import AchievementListScreen from './AchievementListScreen';
 import DonationFormScreen from './DonationFormScreen';
 import DonationHistoryScreen from './DonationHistoryScreen';
+import { notifyAchievementUnlocked } from '../services/notifications';
 import { hasMapsApiKey, hasPlacesApiKey, searchNearbyDonationCenters } from '../services/places';
+import { getAchievements, getNewlyUnlockedAchievements } from '../utils/achievements';
 import {
     calculateNextDonationDate,
     formatDonationDate,
@@ -34,7 +39,9 @@ export default function HomeScreen() {
     const [isLoadingPlaces, setIsLoadingPlaces] = useState(false);
     const [isDonationFormOpen, setIsDonationFormOpen] = useState(false);
     const [isHistoryOpen, setIsHistoryOpen] = useState(false);
+    const [isAchievementsOpen, setIsAchievementsOpen] = useState(false);
     const [donationToDelete, setDonationToDelete] = useState(null);
+    const [achievementToastQueue, setAchievementToastQueue] = useState([]);
 
     useEffect(() => {
         let isMounted = true;
@@ -87,6 +94,46 @@ export default function HomeScreen() {
         };
     }, [settings.language]);
 
+    const faqItems = translate('faqItems');
+    const faqItemCount = Array.isArray(faqItems) ? faqItems.length : 0;
+    const achievements = useMemo(() => (
+        getAchievements({ settings, faqItemCount, translate })
+    ), [faqItemCount, settings, translate]);
+    const currentAchievementToast = achievementToastQueue[0];
+
+    useEffect(() => {
+        const newlyUnlockedAchievements = getNewlyUnlockedAchievements(
+            achievements,
+            settings.unlockedAchievementIds || []
+        );
+
+        if (newlyUnlockedAchievements.length === 0) return;
+
+        const unlockedAchievementIds = Array.from(new Set([
+            ...(settings.unlockedAchievementIds || []),
+            ...newlyUnlockedAchievements.map((achievement) => achievement.id)
+        ]));
+
+        updateSettings({ unlockedAchievementIds });
+        setAchievementToastQueue((currentQueue) => ([
+            ...currentQueue,
+            ...newlyUnlockedAchievements
+        ]));
+        newlyUnlockedAchievements.forEach((achievement) => {
+            notifyAchievementUnlocked(achievement).catch(console.error);
+        });
+    }, [achievements, settings.unlockedAchievementIds, updateSettings]);
+
+    useEffect(() => {
+        if (!currentAchievementToast) return undefined;
+
+        const timer = setTimeout(() => {
+            setAchievementToastQueue((currentQueue) => currentQueue.slice(1));
+        }, 4200);
+
+        return () => clearTimeout(timer);
+    }, [currentAchievementToast?.id]);
+
     const mapRegion = useMemo(() => {
         if (!userLocation) {
             const firstCenter = centers[0];
@@ -118,6 +165,8 @@ export default function HomeScreen() {
     ), [settings.donations]);
     const recentDonationHistory = sortedDonationHistory.slice(0, 3);
     const hasMoreDonationHistory = sortedDonationHistory.length > recentDonationHistory.length;
+    const recentAchievements = achievements.slice(0, 3);
+    const hasMoreAchievements = achievements.length > recentAchievements.length;
     const totalDonatedMl = getTotalDonatedMl(sortedDonationHistory);
     const nextDonationDate = calculateNextDonationDate(
         sortedDonationHistory,
@@ -138,6 +187,15 @@ export default function HomeScreen() {
             <DonationHistoryScreen
                 donations={sortedDonationHistory}
                 onBack={() => setIsHistoryOpen(false)}
+            />
+        );
+    }
+
+    if (isAchievementsOpen) {
+        return (
+            <AchievementListScreen
+                achievements={achievements}
+                onBack={() => setIsAchievementsOpen(false)}
             />
         );
     }
@@ -412,7 +470,27 @@ export default function HomeScreen() {
                         </View>
                     </View>
                 </View>
+
+                <View style={styles.section}>
+                    <Text style={styles.sectionTitle}>{translate('homeAchievements')}</Text>
+                    {recentAchievements.map((achievement) => (
+                        <AchievementItem
+                            key={achievement.id}
+                            achievement={achievement}
+                        />
+                    ))}
+                    {hasMoreAchievements && (
+                        <TouchableOpacity
+                            activeOpacity={0.8}
+                            onPress={() => setIsAchievementsOpen(true)}
+                            style={styles.showAllButton}
+                        >
+                            <Text style={styles.showAllText}>{translate('showAllAchievements')}</Text>
+                        </TouchableOpacity>
+                    )}
+                </View>
             </ScrollView>
+            <AchievementToast achievement={currentAchievementToast} />
             <Modal
                 isVisible={Boolean(donationToDelete)}
                 text={translate('deleteDonationConfirm')}

@@ -16,6 +16,11 @@ const DEFAULT_PATIENT_INFO = {
     city: '',
     preferredCenter: ''
 };
+const DEFAULT_NOTIFICATION_PREFERENCES = {
+    weekBefore: true,
+    dayBefore: true,
+    onDate: true
+};
 const ALLOWED_SEXES = ['female', 'male'];
 
 const getSupportedLanguage = (languageCode) => (
@@ -32,6 +37,9 @@ export default function SettingsProvider({ children }) {
         theme: DEFAULT_THEME,
         hasCompletedOnboarding: false,
         patientInfo: DEFAULT_PATIENT_INFO,
+        notificationPreferences: DEFAULT_NOTIFICATION_PREFERENCES,
+        faqReadItemIds: [],
+        unlockedAchievementIds: [],
         donations: [],
         defaultLogin: null
     }), []);
@@ -51,7 +59,17 @@ export default function SettingsProvider({ children }) {
                 ...patientInfo,
                 sex: ALLOWED_SEXES.includes(patientInfo.sex) ? patientInfo.sex : ''
             },
+            notificationPreferences: {
+                ...defaultSettings.notificationPreferences,
+                ...(savedSettings.notificationPreferences || {})
+            },
             donations: Array.isArray(savedSettings.donations) ? savedSettings.donations : defaultSettings.donations,
+            faqReadItemIds: Array.isArray(savedSettings.faqReadItemIds)
+                ? savedSettings.faqReadItemIds
+                : defaultSettings.faqReadItemIds,
+            unlockedAchievementIds: Array.isArray(savedSettings.unlockedAchievementIds)
+                ? savedSettings.unlockedAchievementIds
+                : defaultSettings.unlockedAchievementIds,
             hasCompletedOnboarding: savedSettings.hasCompletedOnboarding === true,
             language: getSupportedLanguage(savedSettings.language || defaultSettings.language),
             theme: themes[savedSettings.theme] ? savedSettings.theme : defaultSettings.theme

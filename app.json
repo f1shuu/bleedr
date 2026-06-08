@@ -32,6 +32,7 @@
           "locationWhenInUsePermission": "Bleedr używa lokalizacji, aby pokazać pobliskie centra krwiodawstwa."
         }
       ],
+      "expo-notifications",
       "@react-native-community/datetimepicker"
     ],
     "extra": {

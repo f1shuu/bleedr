@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { View } from 'react-native';
 import { StatusBar } from 'expo-status-bar';
 
@@ -7,6 +7,7 @@ import FaqScreen from './screens/FaqScreen';
 import HomeScreen from './screens/HomeScreen';
 import OnboardingScreen from './screens/OnboardingScreen';
 import SettingsScreen from './screens/SettingsScreen';
+import { syncDonationReminderNotifications } from './services/notifications';
 
 import { useSettings } from './SettingsProvider';
 
@@ -18,9 +19,26 @@ const TABS = {
 
 export default function MainScreen() {
     const [activeTab, setActiveTab] = useState('home');
-    const { getColor, settings } = useSettings();
+    const { getColor, settings, translate } = useSettings();
 
     const ActiveScreen = TABS[activeTab] || HomeScreen;
+    const reminderSignature = useMemo(() => JSON.stringify({
+        donations: settings.donations || [],
+        language: settings.language,
+        notificationPreferences: settings.notificationPreferences || {},
+        sex: settings.patientInfo?.sex || '',
+        hasCompletedOnboarding: settings.hasCompletedOnboarding
+    }), [
+        settings.donations,
+        settings.hasCompletedOnboarding,
+        settings.language,
+        settings.notificationPreferences,
+        settings.patientInfo?.sex
+    ]);
+
+    useEffect(() => {
+        syncDonationReminderNotifications({ settings, translate }).catch(console.error);
+    }, [reminderSignature, translate]);
 
     const styles = {
         app: {

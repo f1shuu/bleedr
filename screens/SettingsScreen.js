@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { ScrollView, Text, TouchableOpacity, View } from 'react-native';
+import { ScrollView, Switch, Text, TouchableOpacity, View } from 'react-native';
 
 import Container from '../components/Container';
 import Modal from '../components/Modal';
@@ -16,11 +16,17 @@ const languageOptions = [
     { value: 'pl', label: 'Polski' },
     { value: 'en', label: 'English' }
 ];
+const notificationOptions = [
+    { key: 'weekBefore', labelKey: 'settingsNotificationWeekBefore' },
+    { key: 'dayBefore', labelKey: 'settingsNotificationDayBefore' },
+    { key: 'onDate', labelKey: 'settingsNotificationOnDate' }
+];
 
 export default function SettingsScreen() {
     const [isDeleteModalVisible, setIsDeleteModalVisible] = useState(false);
     const { clearAllData, getColor, settings, translate, updateSettings } = useSettings();
     const patientInfo = settings.patientInfo || {};
+    const notificationPreferences = settings.notificationPreferences || {};
 
     const updatePatientInfo = (key, value) => {
         updateSettings({
@@ -34,6 +40,15 @@ export default function SettingsScreen() {
     const handleClearAllData = async () => {
         await clearAllData();
         setIsDeleteModalVisible(false);
+    };
+
+    const updateNotificationPreference = (key, value) => {
+        updateSettings({
+            notificationPreferences: {
+                ...notificationPreferences,
+                [key]: value
+            }
+        });
     };
 
     const styles = {
@@ -96,6 +111,24 @@ export default function SettingsScreen() {
         optionText: {
             fontFamily: 'KGRedHands',
             fontSize: 13
+        },
+        switchRow: {
+            minHeight: 52,
+            borderColor: getColor('border'),
+            borderWidth: 1,
+            borderRadius: 8,
+            paddingHorizontal: 14,
+            marginBottom: 10,
+            flexDirection: 'row',
+            alignItems: 'center',
+            justifyContent: 'space-between',
+            gap: 12
+        },
+        switchLabel: {
+            flex: 1,
+            fontSize: 14,
+            lineHeight: 20,
+            color: getColor('text')
         },
         dangerButton: {
             minHeight: 48,
@@ -167,6 +200,29 @@ export default function SettingsScreen() {
                         patientInfo={patientInfo}
                         onChange={updatePatientInfo}
                     />
+                </View>
+
+                <View style={styles.section}>
+                    <Text style={styles.sectionTitle}>{translate('settingsNotificationsSection')}</Text>
+
+                    {notificationOptions.map((option) => {
+                        const isEnabled = notificationPreferences[option.key] !== false;
+
+                        return (
+                            <View key={option.key} style={styles.switchRow}>
+                                <Text style={styles.switchLabel}>{translate(option.labelKey)}</Text>
+                                <Switch
+                                    onValueChange={(value) => updateNotificationPreference(option.key, value)}
+                                    thumbColor={isEnabled ? '#FFFFFF' : getColor('muted')}
+                                    trackColor={{
+                                        false: getColor('border'),
+                                        true: getColor('secondary')
+                                    }}
+                                    value={isEnabled}
+                                />
+                            </View>
+                        );
+                    })}
                 </View>
 
                 <View style={styles.section}>

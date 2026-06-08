@@ -7,9 +7,19 @@ import { useSettings } from '../SettingsProvider';
 
 export default function FaqScreen() {
     const [activeIndex, setActiveIndex] = useState(null);
-    const { getColor, translate } = useSettings();
+    const { getColor, settings, translate, updateSettings } = useSettings();
     const faqItems = translate('faqItems');
     const items = Array.isArray(faqItems) ? faqItems : [];
+    const readItemIds = settings.faqReadItemIds || [];
+
+    const markItemAsRead = (index) => {
+        const itemId = `faq-${index}`;
+        if (readItemIds.includes(itemId)) return;
+
+        updateSettings({
+            faqReadItemIds: [...readItemIds, itemId]
+        });
+    };
 
     const styles = {
         screen: {
@@ -82,9 +92,12 @@ export default function FaqScreen() {
                                 accessibilityRole='button'
                                 accessibilityState={{ expanded: isOpen }}
                                 activeOpacity={0.8}
-                                onPress={() => setActiveIndex((currentIndex) => (
-                                    currentIndex === index ? null : index
-                                ))}
+                                onPress={() => setActiveIndex((currentIndex) => {
+                                    const nextIndex = currentIndex === index ? null : index;
+                                    if (nextIndex !== null) markItemAsRead(index);
+
+                                    return nextIndex;
+                                })}
                                 style={styles.header}
                             >
                                 <Text style={styles.question}>{item.question}</Text>
