@@ -1,3 +1,5 @@
+import Constants from 'expo-constants';
+
 const GOOGLE_PLACES_TEXT_SEARCH_URL = 'https://places.googleapis.com/v1/places:searchText';
 const GOOGLE_PLACES_FIELD_MASK = [
     'places.id',
@@ -10,6 +12,30 @@ const GOOGLE_PLACES_FIELD_MASK = [
 export const getPlacesApiKey = () => process.env.EXPO_PUBLIC_GOOGLE_PLACES_API_KEY;
 
 export const hasPlacesApiKey = () => Boolean(getPlacesApiKey());
+
+const getExpoConfigExtra = () => (
+    Constants.expoConfig?.extra
+    || Constants.manifest?.extra
+    || Constants.manifest2?.extra?.expoClient?.extra
+    || {}
+);
+
+const getNativeMapsApiKey = () => (
+    Constants.expoConfig?.android?.config?.googleMaps?.apiKey
+    || Constants.manifest?.android?.config?.googleMaps?.apiKey
+    || Constants.manifest2?.extra?.expoClient?.android?.config?.googleMaps?.apiKey
+);
+
+const hasConfiguredMapsApiKey = () => Boolean(
+    getExpoConfigExtra().hasGoogleMapsApiKey
+    || getNativeMapsApiKey()
+);
+
+export const getMapsApiKey = () => process.env.EXPO_PUBLIC_GOOGLE_MAPS_API_KEY
+    || process.env.EXPO_PUBLIC_GOOGLE_PLACES_API_KEY
+    || getNativeMapsApiKey();
+
+export const hasMapsApiKey = () => Boolean(getMapsApiKey()) || hasConfiguredMapsApiKey();
 
 const normalizePlace = (place) => ({
     id: place.id || place.name,

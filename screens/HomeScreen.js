@@ -8,12 +8,13 @@ import DonationHistoryItem from '../components/DonationHistoryItem';
 import Modal from '../components/Modal';
 import DonationFormScreen from './DonationFormScreen';
 import DonationHistoryScreen from './DonationHistoryScreen';
-import { hasPlacesApiKey, searchNearbyDonationCenters } from '../services/places';
+import { hasMapsApiKey, hasPlacesApiKey, searchNearbyDonationCenters } from '../services/places';
 import {
     calculateNextDonationDate,
+    formatDonationDate,
+    formatDonationVolume,
     getSortedDonations,
-    getTotalDonatedMl,
-    parseDateInputValue
+    getTotalDonatedMl
 } from '../utils/donations';
 
 import { useSettings } from '../SettingsProvider';
@@ -24,18 +25,6 @@ const DEFAULT_REGION = {
     latitudeDelta: 0.18,
     longitudeDelta: 0.18
 };
-
-const formatDate = (date, language) => (
-    new Intl.DateTimeFormat(language === 'pl' ? 'pl-PL' : 'en-US', {
-        day: '2-digit',
-        month: 'short',
-        year: 'numeric'
-    }).format(typeof date === 'string' ? parseDateInputValue(date) : date)
-);
-
-const formatDonationVolume = (milliliters, language) => (
-    `${new Intl.NumberFormat(language === 'pl' ? 'pl-PL' : 'en-US').format(milliliters)} ml`
-);
 
 export default function HomeScreen() {
     const { getColor, settings, translate, updateSettings } = useSettings();
@@ -122,6 +111,7 @@ export default function HomeScreen() {
     }, [centers, userLocation]);
 
     const statusText = translate(`placesStatus.${placesStatus}`);
+    const canRenderMap = hasMapsApiKey();
     const bloodType = settings.patientInfo?.bloodType || translate('homeNotProvided');
     const sortedDonationHistory = useMemo(() => (
         getSortedDonations(settings.donations || [])
@@ -248,6 +238,17 @@ export default function HomeScreen() {
         map: {
             height: 230
         },
+        mapUnavailable: {
+            alignItems: 'center',
+            justifyContent: 'center',
+            padding: 18
+        },
+        mapUnavailableText: {
+            fontSize: 13,
+            lineHeight: 19,
+            color: getColor('muted'),
+            textAlign: 'center'
+        },
         mapFooter: {
             padding: 14,
             borderTopColor: getColor('border'),
@@ -325,7 +326,7 @@ export default function HomeScreen() {
                         <Text style={styles.statLabel}>{translate('homeNextDonation')}</Text>
                         <Text numberOfLines={1} style={styles.statValue}>
                             {nextDonationDate
-                                ? formatDate(nextDonationDate, settings.language)
+                                ? formatDonationDate(nextDonationDate, settings.language)
                                 : translate('homeNotProvided')}
                         </Text>
                     </View>
@@ -340,7 +341,7 @@ export default function HomeScreen() {
                             <DonationHistoryItem
                                 key={donation.id}
                                 donation={donation}
-                                formattedDate={formatDate(donation.date, settings.language)}
+                                formattedDate={formatDonationDate(donation.date, settings.language)}
                                 onDelete={setDonationToDelete}
                             />
                         ))
@@ -359,30 +360,38 @@ export default function HomeScreen() {
                 <View style={styles.section}>
                     <Text style={styles.sectionTitle}>{translate('homeNearbyCenters')}</Text>
                     <View style={styles.mapCard}>
-                        <MapView
-                            initialRegion={mapRegion}
-                            region={mapRegion}
-                            style={styles.map}
-                        >
-                            {userLocation && (
-                                <Marker
-                                    coordinate={userLocation}
-                                    pinColor={getColor('secondary')}
-                                    title={translate('homeYourLocation')}
-                                />
-                            )}
-                            {centers.map((center) => (
-                                <Marker
-                                    key={center.id}
-                                    coordinate={{
-                                        latitude: center.latitude,
-                                        longitude: center.longitude
-                                    }}
-                                    title={center.name}
-                                    description={center.address}
-                                />
-                            ))}
-                        </MapView>
+                        {canRenderMap ? (
+                            <MapView
+                                initialRegion={mapRegion}
+                                region={mapRegion}
+                                style={styles.map}
+                            >
+                                {userLocation && (
+                                    <Marker
+                                        coordinate={userLocation}
+                                        pinColor={getColor('secondary')}
+                                        title={translate('homeYourLocation')}
+                                    />
+                                )}
+                                {centers.map((center) => (
+                                    <Marker
+                                        key={center.id}
+                                        coordinate={{
+                                            latitude: center.latitude,
+                                            longitude: center.longitude
+                                        }}
+                                        title={center.name}
+                                        description={center.address}
+                                    />
+                                ))}
+                            </MapView>
+                        ) : (
+                            <View style={[styles.map, styles.mapUnavailable]}>
+                                <Text style={styles.mapUnavailableText}>
+                                    {translate('homeMapUnavailable')}
+                                </Text>
+                            </View>
+                        )}
                         <View style={styles.mapFooter}>
                             <View style={styles.statusRow}>
                                 {isLoadingPlaces && (

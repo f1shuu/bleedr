@@ -22,6 +22,28 @@ export const formatDateInputValue = (date) => {
     return `${year}-${month}-${day}`;
 };
 
+export const formatDonationDate = (value, language = 'en') => {
+    const date = typeof value === 'string' ? parseDateInputValue(value) : value;
+
+    if (!(date instanceof Date) || Number.isNaN(date.getTime())) return '';
+
+    const year = date.getFullYear();
+    const month = `${date.getMonth() + 1}`.padStart(2, '0');
+    const day = `${date.getDate()}`.padStart(2, '0');
+
+    return language === 'pl'
+        ? `${day}.${month}.${year}`
+        : `${month}/${day}/${year}`;
+};
+
+export const formatDonationVolume = (milliliters, language = 'en') => {
+    const safeValue = Number.isFinite(milliliters) ? Math.max(0, Math.round(milliliters)) : 0;
+    const separator = language === 'pl' ? ' ' : ',';
+    const formattedValue = `${safeValue}`.replace(/\B(?=(\d{3})+(?!\d))/g, separator);
+
+    return `${formattedValue} ml`;
+};
+
 export const parseDateInputValue = (date) => {
     if (!date) return null;
 

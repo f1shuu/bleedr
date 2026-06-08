@@ -2,7 +2,7 @@
   "expo": {
     "name": "Bleedr",
     "slug": "bleedr",
-    "version": "0.0.1",
+    "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
     "userInterfaceStyle": "dark",
@@ -16,7 +16,12 @@
       "adaptiveIcon": {
         "foregroundImage": "./assets/images/icon.png",
         "backgroundColor": "#FAF9F6"
-      }
+      },
+      "permissions": [
+        "android.permission.ACCESS_COARSE_LOCATION",
+        "android.permission.ACCESS_FINE_LOCATION"
+      ],
+      "package": "com.f1shu.bleedr"
     },
     "plugins": [
       "expo-localization",
@@ -28,6 +33,11 @@
         }
       ],
       "@react-native-community/datetimepicker"
-    ]
+    ],
+    "extra": {
+      "eas": {
+        "projectId": "122cba32-48d8-408d-94ac-fdf0a3dffb19"
+      }
+    }
   }
 }

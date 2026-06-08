@@ -5,17 +5,9 @@ import { FontAwesome6 } from '@expo/vector-icons';
 import Container from '../components/Container';
 import DonationHistoryItem from '../components/DonationHistoryItem';
 import Modal from '../components/Modal';
-import { getSortedDonations } from '../utils/donations';
+import { formatDonationDate, getSortedDonations } from '../utils/donations';
 
 import { useSettings } from '../SettingsProvider';
-
-const formatDate = (date, language) => (
-    new Intl.DateTimeFormat(language === 'pl' ? 'pl-PL' : 'en-US', {
-        day: '2-digit',
-        month: 'short',
-        year: 'numeric'
-    }).format(new Date(date))
-);
 
 export default function DonationHistoryScreen({ donations, onBack }) {
     const [donationToDelete, setDonationToDelete] = useState(null);
@@ -90,7 +82,7 @@ export default function DonationHistoryScreen({ donations, onBack }) {
                     <DonationHistoryItem
                         key={donation.id}
                         donation={donation}
-                        formattedDate={formatDate(donation.date, settings.language)}
+                        formattedDate={formatDonationDate(donation.date, settings.language)}
                         onDelete={setDonationToDelete}
                     />
                 ))}
