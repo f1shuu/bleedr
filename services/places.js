@@ -7,7 +7,9 @@ const GOOGLE_PLACES_FIELD_MASK = [
     'places.googleMapsUri'
 ].join(',');
 
-const getPlacesApiKey = () => process.env.EXPO_PUBLIC_GOOGLE_PLACES_API_KEY;
+export const getPlacesApiKey = () => process.env.EXPO_PUBLIC_GOOGLE_PLACES_API_KEY;
+
+export const hasPlacesApiKey = () => Boolean(getPlacesApiKey());
 
 const normalizePlace = (place) => ({
     id: place.id || place.name,

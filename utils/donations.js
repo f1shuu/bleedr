@@ -1,4 +1,4 @@
-import { wholeBloodDonationMl } from '../constants/homeMockData';
+const WHOLE_BLOOD_DONATION_ML = 450;
 
 const DONATION_LIMITS = {
     female: 4,
@@ -10,9 +10,14 @@ const ROLLING_YEAR_DAYS = 365;
 
 export const getTodayDateInputValue = () => {
     const today = new Date();
-    const year = today.getFullYear();
-    const month = `${today.getMonth() + 1}`.padStart(2, '0');
-    const day = `${today.getDate()}`.padStart(2, '0');
+
+    return formatDateInputValue(today);
+};
+
+export const formatDateInputValue = (date) => {
+    const year = date.getFullYear();
+    const month = `${date.getMonth() + 1}`.padStart(2, '0');
+    const day = `${date.getDate()}`.padStart(2, '0');
 
     return `${year}-${month}-${day}`;
 };
@@ -39,7 +44,7 @@ export const getSortedDonations = (donations = []) => (
     ))
 );
 
-export const getTotalDonatedMl = (donations = []) => donations.length * wholeBloodDonationMl;
+export const getTotalDonatedMl = (donations = []) => donations.length * WHOLE_BLOOD_DONATION_ML;
 
 export const calculateNextDonationDate = (donations = [], sex) => {
     const donationDates = getSortedDonations(donations)

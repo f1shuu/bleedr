@@ -4,10 +4,11 @@ import * as Location from 'expo-location';
 import MapView, { Marker } from 'react-native-maps';
 
 import Container from '../components/Container';
-import { fallbackDonationCenters } from '../constants/homeMockData';
+import DonationHistoryItem from '../components/DonationHistoryItem';
+import Modal from '../components/Modal';
 import DonationFormScreen from './DonationFormScreen';
 import DonationHistoryScreen from './DonationHistoryScreen';
-import { searchNearbyDonationCenters } from '../services/places';
+import { hasPlacesApiKey, searchNearbyDonationCenters } from '../services/places';
 import {
     calculateNextDonationDate,
     getSortedDonations,
@@ -37,18 +38,24 @@ const formatDonationVolume = (milliliters, language) => (
 );
 
 export default function HomeScreen() {
-    const { getColor, settings, translate } = useSettings();
+    const { getColor, settings, translate, updateSettings } = useSettings();
     const [userLocation, setUserLocation] = useState(null);
-    const [centers, setCenters] = useState(fallbackDonationCenters);
+    const [centers, setCenters] = useState([]);
     const [placesStatus, setPlacesStatus] = useState('idle');
     const [isLoadingPlaces, setIsLoadingPlaces] = useState(false);
     const [isDonationFormOpen, setIsDonationFormOpen] = useState(false);
     const [isHistoryOpen, setIsHistoryOpen] = useState(false);
+    const [donationToDelete, setDonationToDelete] = useState(null);
 
     useEffect(() => {
         let isMounted = true;
 
         const loadCenters = async () => {
+            if (!hasPlacesApiKey()) {
+                setPlacesStatus('missing-api-key');
+                return;
+            }
+
             setIsLoadingPlaces(true);
 
             try {
@@ -127,6 +134,15 @@ export default function HomeScreen() {
         settings.patientInfo?.sex
     );
 
+    const confirmDeleteDonation = async () => {
+        if (!donationToDelete) return;
+
+        await updateSettings({
+            donations: (settings.donations || []).filter((donation) => donation.id !== donationToDelete.id)
+        });
+        setDonationToDelete(null);
+    };
+
     if (isHistoryOpen) {
         return (
             <DonationHistoryScreen
@@ -158,7 +174,8 @@ export default function HomeScreen() {
             width: 140,
             height: 140,
             borderRadius: 70,
-            marginBottom: 14
+            marginBottom: 20,
+            elevation: 3
         },
         greeting: {
             fontFamily: 'KGRedHands',
@@ -202,19 +219,6 @@ export default function HomeScreen() {
             fontSize: 18,
             color: getColor('secondary'),
             marginBottom: 12
-        },
-        historyItem: {
-            borderColor: getColor('border'),
-            borderWidth: 1,
-            borderRadius: 8,
-            padding: 14,
-            marginBottom: 10
-        },
-        historyDate: {
-            fontFamily: 'KGRedHands',
-            fontSize: 16,
-            color: getColor('text'),
-            marginBottom: 6
         },
         historyPlace: {
             fontSize: 14,
@@ -262,7 +266,8 @@ export default function HomeScreen() {
             color: getColor('muted')
         },
         centerItem: {
-            marginTop: 8
+            marginTop: 10,
+            marginBottom: 10
         },
         centerName: {
             fontFamily: 'KGRedHands',
@@ -274,6 +279,12 @@ export default function HomeScreen() {
             lineHeight: 18,
             color: getColor('muted'),
             marginTop: 3
+        },
+        emptyCentersText: {
+            fontSize: 13,
+            lineHeight: 18,
+            color: getColor('muted'),
+            marginTop: 8
         }
     };
 
@@ -326,12 +337,12 @@ export default function HomeScreen() {
                         <Text style={styles.historyPlace}>{translate('homeDonationHistoryEmpty')}</Text>
                     ) : (
                         recentDonationHistory.map((donation) => (
-                            <View key={donation.id} style={styles.historyItem}>
-                                <Text style={styles.historyDate}>
-                                    {formatDate(donation.date, settings.language)}
-                                </Text>
-                                <Text style={styles.historyPlace}>{donation.place}</Text>
-                            </View>
+                            <DonationHistoryItem
+                                key={donation.id}
+                                donation={donation}
+                                formattedDate={formatDate(donation.date, settings.language)}
+                                onDelete={setDonationToDelete}
+                            />
                         ))
                     )}
                     {hasMoreDonationHistory && (
@@ -379,16 +390,29 @@ export default function HomeScreen() {
                                 )}
                                 <Text style={styles.statusText}>{statusText}</Text>
                             </View>
-                            {centers.slice(0, 3).map((center) => (
-                                <View key={center.id} style={styles.centerItem}>
-                                    <Text style={styles.centerName}>{center.name}</Text>
-                                    <Text style={styles.centerAddress}>{center.address}</Text>
-                                </View>
-                            ))}
+                            {centers.length === 0 ? (
+                                <Text style={styles.emptyCentersText}>{translate('homeNearbyCentersEmpty')}</Text>
+                            ) : (
+                                centers.slice(0, 3).map((center) => (
+                                    <View key={center.id} style={styles.centerItem}>
+                                        <Text style={styles.centerName}>{center.name}</Text>
+                                        <Text style={styles.centerAddress}>{center.address}</Text>
+                                    </View>
+                                ))
+                            )}
                         </View>
                     </View>
                 </View>
             </ScrollView>
+            <Modal
+                isVisible={Boolean(donationToDelete)}
+                text={translate('deleteDonationConfirm')}
+                twoButtons={true}
+                buttonOneText={translate('deleteDonationConfirmButton')}
+                buttonTwoText={translate('deleteDonationCancelButton')}
+                buttonOneOnPress={confirmDeleteDonation}
+                buttonTwoOnPress={() => setDonationToDelete(null)}
+            />
         </Container>
     )
 }

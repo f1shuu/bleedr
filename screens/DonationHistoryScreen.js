@@ -1,7 +1,11 @@
+import { useState } from 'react';
 import { ScrollView, Text, TouchableOpacity, View } from 'react-native';
 import { FontAwesome6 } from '@expo/vector-icons';
 
 import Container from '../components/Container';
+import DonationHistoryItem from '../components/DonationHistoryItem';
+import Modal from '../components/Modal';
+import { getSortedDonations } from '../utils/donations';
 
 import { useSettings } from '../SettingsProvider';
 
@@ -14,7 +18,18 @@ const formatDate = (date, language) => (
 );
 
 export default function DonationHistoryScreen({ donations, onBack }) {
-    const { getColor, settings, translate } = useSettings();
+    const [donationToDelete, setDonationToDelete] = useState(null);
+    const { getColor, settings, translate, updateSettings } = useSettings();
+    const sortedDonations = getSortedDonations(donations);
+
+    const confirmDeleteDonation = async () => {
+        if (!donationToDelete) return;
+
+        await updateSettings({
+            donations: (settings.donations || []).filter((donation) => donation.id !== donationToDelete.id)
+        });
+        setDonationToDelete(null);
+    };
 
     const styles = {
         screen: {
@@ -46,24 +61,6 @@ export default function DonationHistoryScreen({ donations, onBack }) {
             fontSize: 24,
             color: getColor('secondary')
         },
-        historyItem: {
-            borderColor: getColor('border'),
-            borderWidth: 1,
-            borderRadius: 8,
-            padding: 14,
-            marginBottom: 10
-        },
-        historyDate: {
-            fontFamily: 'KGRedHands',
-            fontSize: 16,
-            color: getColor('text'),
-            marginBottom: 6
-        },
-        historyPlace: {
-            fontSize: 14,
-            lineHeight: 20,
-            color: getColor('muted')
-        }
     };
 
     return (
@@ -89,15 +86,24 @@ export default function DonationHistoryScreen({ donations, onBack }) {
                     <Text style={styles.title}>{translate('allDonationsTitle')}</Text>
                 </View>
 
-                {donations.map((donation) => (
-                    <View key={donation.id} style={styles.historyItem}>
-                        <Text style={styles.historyDate}>
-                            {formatDate(donation.date, settings.language)}
-                        </Text>
-                        <Text style={styles.historyPlace}>{donation.place}</Text>
-                    </View>
+                {sortedDonations.map((donation) => (
+                    <DonationHistoryItem
+                        key={donation.id}
+                        donation={donation}
+                        formattedDate={formatDate(donation.date, settings.language)}
+                        onDelete={setDonationToDelete}
+                    />
                 ))}
             </ScrollView>
+            <Modal
+                isVisible={Boolean(donationToDelete)}
+                text={translate('deleteDonationConfirm')}
+                twoButtons={true}
+                buttonOneText={translate('deleteDonationConfirmButton')}
+                buttonTwoText={translate('deleteDonationCancelButton')}
+                buttonOneOnPress={confirmDeleteDonation}
+                buttonTwoOnPress={() => setDonationToDelete(null)}
+            />
         </Container>
     )
 }

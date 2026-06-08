@@ -1,22 +1,37 @@
 import { useState } from 'react';
-import { ScrollView, Text, TextInput, TouchableOpacity, View } from 'react-native';
+import { Platform, ScrollView, Text, TextInput, TouchableOpacity, View } from 'react-native';
 import { FontAwesome6 } from '@expo/vector-icons';
+import DateTimePicker from '@react-native-community/datetimepicker';
 
 import Container from '../components/Container';
-import { getTodayDateInputValue, parseDateInputValue } from '../utils/donations';
+import {
+    formatDateInputValue,
+    getTodayDateInputValue,
+    parseDateInputValue
+} from '../utils/donations';
 
 import { useSettings } from '../SettingsProvider';
 
 export default function DonationFormScreen({ onBack }) {
     const { getColor, settings, translate, updateSettings } = useSettings();
     const [place, setPlace] = useState(settings.patientInfo?.preferredCenter || '');
-    const [date, setDate] = useState(getTodayDateInputValue());
+    const [selectedDate, setSelectedDate] = useState(parseDateInputValue(getTodayDateInputValue()));
+    const [isDatePickerVisible, setIsDatePickerVisible] = useState(false);
+
+    const handleDateChange = (event, date) => {
+        if (event.type === 'dismissed') {
+            setIsDatePickerVisible(false);
+            return;
+        }
+
+        setSelectedDate(date || selectedDate);
+        if (Platform.OS !== 'ios') setIsDatePickerVisible(false);
+    };
 
     const saveDonation = async () => {
-        const donationDate = parseDateInputValue(date) ? date : getTodayDateInputValue();
         const donation = {
             id: `donation-${Date.now()}`,
-            date: donationDate,
+            date: formatDateInputValue(selectedDate),
             place: place || translate('donationPlaceFallback')
         };
 
@@ -89,6 +104,13 @@ export default function DonationFormScreen({ onBack }) {
             color: getColor('text'),
             fontSize: 15
         },
+        dateButton: {
+            justifyContent: 'center'
+        },
+        dateText: {
+            color: getColor('text'),
+            fontSize: 15
+        },
         primaryButton: {
             minHeight: 52,
             borderRadius: 8,
@@ -147,15 +169,22 @@ export default function DonationFormScreen({ onBack }) {
 
                 <View style={styles.field}>
                     <Text style={styles.label}>{translate('donationDate')}</Text>
-                    <TextInput
-                        keyboardType='numbers-and-punctuation'
-                        onChangeText={setDate}
-                        placeholder={translate('donationDatePlaceholder')}
-                        placeholderTextColor={getColor('muted')}
-                        selectionColor={getColor('secondary')}
-                        style={styles.input}
-                        value={date}
-                    />
+                    <TouchableOpacity
+                        accessibilityRole='button'
+                        activeOpacity={0.8}
+                        onPress={() => setIsDatePickerVisible(true)}
+                        style={[styles.input, styles.dateButton]}
+                    >
+                        <Text style={styles.dateText}>{formatDateInputValue(selectedDate)}</Text>
+                    </TouchableOpacity>
+                    {isDatePickerVisible && (
+                        <DateTimePicker
+                            maximumDate={new Date()}
+                            mode='date'
+                            onChange={handleDateChange}
+                            value={selectedDate}
+                        />
+                    )}
                 </View>
 
                 <TouchableOpacity

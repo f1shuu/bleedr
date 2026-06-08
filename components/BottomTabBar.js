@@ -1,4 +1,5 @@
-import { SafeAreaView, Text, TouchableOpacity, View } from 'react-native';
+import { Text, TouchableOpacity, View } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import { FontAwesome6 } from '@expo/vector-icons';
 
 import { useSettings } from '../SettingsProvider';
@@ -20,7 +21,7 @@ export default function BottomTabBar({ activeTab, onChange }) {
         },
         tabBar: {
             flexDirection: 'row',
-            height: 70
+            height: 60
         },
         tab: {
             flex: 1,
@@ -30,13 +31,13 @@ export default function BottomTabBar({ activeTab, onChange }) {
         },
         label: {
             fontFamily: 'KGRedHands',
-            fontSize: 12,
+            fontSize: 11,
             textAlign: 'center'
         }
     };
 
     return (
-        <SafeAreaView style={styles.safeArea}>
+        <SafeAreaView edges={['bottom']} style={styles.safeArea}>
             <View style={styles.tabBar}>
                 {tabs.map((tab) => {
                     const isActive = activeTab === tab.key;
@@ -52,7 +53,7 @@ export default function BottomTabBar({ activeTab, onChange }) {
                         >
                             <FontAwesome6
                                 name={tab.icon}
-                                size={22}
+                                size={20}
                                 color={isActive ? getColor('secondary') : getColor('muted')}
                             />
                             <Text
