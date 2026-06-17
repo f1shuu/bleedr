@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import { ActivityIndicator, Image, ScrollView, Text, TouchableOpacity, View } from 'react-native';
 import * as Location from 'expo-location';
 import MapView, { Marker } from 'react-native-maps';
@@ -43,55 +43,47 @@ export default function HomeScreen() {
     const [donationToDelete, setDonationToDelete] = useState(null);
     const [achievementToastQueue, setAchievementToastQueue] = useState([]);
 
-    useEffect(() => {
-        let isMounted = true;
+    const loadNearbyCenters = useCallback(async () => {
+        if (!hasPlacesApiKey()) {
+            setCenters([]);
+            setUserLocation(null);
+            setPlacesStatus('missing-api-key');
+            return;
+        }
 
-        const loadCenters = async () => {
-            if (!hasPlacesApiKey()) {
-                setPlacesStatus('missing-api-key');
+        setIsLoadingPlaces(true);
+
+        try {
+            const permission = await Location.requestForegroundPermissionsAsync();
+
+            if (permission.status !== 'granted') {
+                setCenters([]);
+                setUserLocation(null);
+                setPlacesStatus('location-denied');
                 return;
             }
 
-            setIsLoadingPlaces(true);
+            const currentPosition = await Location.getCurrentPositionAsync({});
+            const currentLocation = {
+                latitude: currentPosition.coords.latitude,
+                longitude: currentPosition.coords.longitude
+            };
 
-            try {
-                const permission = await Location.requestForegroundPermissionsAsync();
+            setUserLocation(currentLocation);
 
-                if (permission.status !== 'granted') {
-                    if (isMounted) setPlacesStatus('location-denied');
-                    return;
-                }
+            const result = await searchNearbyDonationCenters({
+                ...currentLocation,
+                languageCode: settings.language
+            });
 
-                const currentPosition = await Location.getCurrentPositionAsync({});
-                const currentLocation = {
-                    latitude: currentPosition.coords.latitude,
-                    longitude: currentPosition.coords.longitude
-                };
-
-                if (isMounted) setUserLocation(currentLocation);
-
-                const result = await searchNearbyDonationCenters({
-                    ...currentLocation,
-                    languageCode: settings.language
-                });
-
-                if (!isMounted) return;
-
-                setPlacesStatus(result.status);
-                if (result.places.length > 0) setCenters(result.places);
-            } catch (error) {
-                console.error(error);
-                if (isMounted) setPlacesStatus('error');
-            } finally {
-                if (isMounted) setIsLoadingPlaces(false);
-            }
-        };
-
-        loadCenters();
-
-        return () => {
-            isMounted = false;
-        };
+            setPlacesStatus(result.status);
+            setCenters(result.places);
+        } catch (error) {
+            console.error(error);
+            setPlacesStatus('error');
+        } finally {
+            setIsLoadingPlaces(false);
+        }
     }, [settings.language]);
 
     const faqItems = translate('faqItems');
@@ -287,6 +279,25 @@ export default function HomeScreen() {
             fontSize: 14,
             color: getColor('secondary')
         },
+        loadCentersButton: {
+            minHeight: 44,
+            borderColor: getColor('secondary'),
+            borderWidth: 1,
+            borderRadius: 8,
+            alignItems: 'center',
+            justifyContent: 'center',
+            paddingHorizontal: 14,
+            marginBottom: 12,
+            flexDirection: 'row',
+            gap: 8,
+            opacity: isLoadingPlaces ? 0.68 : 1
+        },
+        loadCentersButtonText: {
+            fontFamily: 'KGRedHands',
+            fontSize: 13,
+            color: getColor('secondary'),
+            textAlign: 'center'
+        },
         mapCard: {
             borderColor: getColor('border'),
             borderWidth: 1,
@@ -451,10 +462,21 @@ export default function HomeScreen() {
                             </View>
                         )}
                         <View style={styles.mapFooter}>
-                            <View style={styles.statusRow}>
+                            <TouchableOpacity
+                                accessibilityRole='button'
+                                activeOpacity={0.8}
+                                disabled={isLoadingPlaces}
+                                onPress={loadNearbyCenters}
+                                style={styles.loadCentersButton}
+                            >
                                 {isLoadingPlaces && (
                                     <ActivityIndicator color={getColor('secondary')} size='small' />
                                 )}
+                                <Text style={styles.loadCentersButtonText}>
+                                    {translate('homeLoadNearbyCenters')}
+                                </Text>
+                            </TouchableOpacity>
+                            <View style={styles.statusRow}>
                                 <Text style={styles.statusText}>{statusText}</Text>
                             </View>
                             {centers.length === 0 ? (

@@ -98,3 +98,49 @@ export const searchNearbyDonationCenters = async ({ latitude, longitude, languag
         status: 'ready'
     };
 };
+
+export const searchDonationCentersByText = async ({ city, languageCode }) => {
+    const apiKey = getPlacesApiKey();
+
+    if (!apiKey) {
+        return {
+            places: [],
+            status: 'missing-api-key'
+        };
+    }
+
+    const query = languageCode === 'pl'
+        ? `centrum krwiodawstwa ${city || ''}`.trim()
+        : `blood donation center ${city || ''}`.trim();
+
+    const response = await fetch(GOOGLE_PLACES_TEXT_SEARCH_URL, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-Goog-Api-Key': apiKey,
+            'X-Goog-FieldMask': GOOGLE_PLACES_FIELD_MASK
+        },
+        body: JSON.stringify({
+            textQuery: query,
+            pageSize: 6,
+            languageCode
+        })
+    });
+
+    if (!response.ok) {
+        return {
+            places: [],
+            status: 'error'
+        };
+    }
+
+    const data = await response.json();
+    const places = (data.places || [])
+        .map(normalizePlace)
+        .filter((place) => place.name);
+
+    return {
+        places,
+        status: 'ready'
+    };
+};

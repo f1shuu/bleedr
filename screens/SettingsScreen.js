@@ -56,7 +56,7 @@ export default function SettingsScreen() {
             paddingBottom: 0
         },
         content: {
-            paddingBottom: 26
+            paddingBottom: 150
         },
         title: {
             fontFamily: 'KGRedHands',
@@ -186,6 +186,8 @@ export default function SettingsScreen() {
         <Container additionalStyle={styles.screen}>
             <ScrollView
                 contentContainerStyle={styles.content}
+                keyboardDismissMode='on-drag'
+                keyboardShouldPersistTaps='handled'
                 showsVerticalScrollIndicator={false}
             >
                 <Text style={styles.title}>{translate('settingsTitle')}</Text>

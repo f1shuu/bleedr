@@ -29,7 +29,7 @@ export default function OnboardingScreen() {
             paddingBottom: 0
         },
         content: {
-            paddingBottom: 30
+            paddingBottom: 150
         },
         hero: {
             alignItems: 'center',
@@ -89,6 +89,8 @@ export default function OnboardingScreen() {
         <Container additionalStyle={styles.screen}>
             <ScrollView
                 contentContainerStyle={styles.content}
+                keyboardDismissMode='on-drag'
+                keyboardShouldPersistTaps='handled'
                 showsVerticalScrollIndicator={false}
             >
                 <View style={styles.hero}>

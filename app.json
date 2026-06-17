@@ -21,7 +21,8 @@
         "android.permission.ACCESS_COARSE_LOCATION",
         "android.permission.ACCESS_FINE_LOCATION"
       ],
-      "package": "com.f1shu.bleedr"
+      "package": "com.f1shu.bleedr",
+      "softwareKeyboardLayoutMode": "resize"
     },
     "plugins": [
       "expo-localization",

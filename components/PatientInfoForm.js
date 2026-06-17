@@ -1,5 +1,10 @@
-import { Text, TextInput, TouchableOpacity, View } from 'react-native';
+import { useState } from 'react';
+import { ActivityIndicator, Text, TextInput, TouchableOpacity, View } from 'react-native';
 
+import {
+    hasPlacesApiKey,
+    searchDonationCentersByText
+} from '../services/places';
 import { useSettings } from '../SettingsProvider';
 
 const bloodTypeOptions = ['0-', '0+', 'A-', 'A+', 'B-', 'B+', 'AB-', 'AB+'];
@@ -9,7 +14,45 @@ const sexOptions = [
 ];
 
 export default function PatientInfoForm({ patientInfo, onChange }) {
-    const { getColor, translate } = useSettings();
+    const { getColor, settings, translate } = useSettings();
+    const [centerSuggestions, setCenterSuggestions] = useState([]);
+    const [centerSuggestionStatus, setCenterSuggestionStatus] = useState(null);
+    const [isLoadingCenterSuggestions, setIsLoadingCenterSuggestions] = useState(false);
+    const city = patientInfo.city?.trim() || '';
+    const canLoadCenterSuggestions = !isLoadingCenterSuggestions;
+
+    const loadCenterSuggestions = async () => {
+        if (!hasPlacesApiKey()) {
+            setCenterSuggestions([]);
+            setCenterSuggestionStatus('missing-api-key');
+            return;
+        }
+
+        if (!city) {
+            setCenterSuggestions([]);
+            setCenterSuggestionStatus('missing-city');
+            return;
+        }
+
+        setIsLoadingCenterSuggestions(true);
+        setCenterSuggestionStatus(null);
+
+        try {
+            const result = await searchDonationCentersByText({
+                city,
+                languageCode: settings.language
+            });
+
+            setCenterSuggestions(result.places);
+            setCenterSuggestionStatus(result.places.length > 0 ? 'ready' : 'empty');
+        } catch (error) {
+            console.error(error);
+            setCenterSuggestions([]);
+            setCenterSuggestionStatus('error');
+        } finally {
+            setIsLoadingCenterSuggestions(false);
+        }
+    };
 
     const styles = {
         field: {
@@ -30,6 +73,12 @@ export default function PatientInfoForm({ patientInfo, onChange }) {
             color: getColor('text'),
             fontSize: 15
         },
+        helpText: {
+            fontSize: 12,
+            lineHeight: 18,
+            color: getColor('muted'),
+            marginTop: 7
+        },
         optionRow: {
             flexDirection: 'row',
             flexWrap: 'wrap',
@@ -46,6 +95,46 @@ export default function PatientInfoForm({ patientInfo, onChange }) {
         optionText: {
             fontFamily: 'KGRedHands',
             fontSize: 13
+        },
+        loadButton: {
+            minHeight: 44,
+            borderRadius: 8,
+            borderWidth: 1,
+            borderColor: canLoadCenterSuggestions ? getColor('secondary') : getColor('border'),
+            alignItems: 'center',
+            justifyContent: 'center',
+            paddingHorizontal: 14,
+            marginTop: 10,
+            flexDirection: 'row',
+            gap: 8,
+            opacity: canLoadCenterSuggestions ? 1 : 0.62
+        },
+        loadButtonText: {
+            fontFamily: 'KGRedHands',
+            fontSize: 13,
+            color: canLoadCenterSuggestions ? getColor('secondary') : getColor('muted')
+        },
+        suggestionList: {
+            marginTop: 10,
+            gap: 8
+        },
+        suggestion: {
+            borderColor: getColor('border'),
+            borderWidth: 1,
+            borderRadius: 8,
+            padding: 12
+        },
+        suggestionName: {
+            fontFamily: 'KGRedHands',
+            fontSize: 13,
+            lineHeight: 18,
+            color: getColor('text')
+        },
+        suggestionAddress: {
+            fontSize: 12,
+            lineHeight: 17,
+            color: getColor('muted'),
+            marginTop: 3
         }
     };
 
@@ -81,16 +170,82 @@ export default function PatientInfoForm({ patientInfo, onChange }) {
         <View style={styles.field}>
             <Text style={styles.label}>{translate(labelKey)}</Text>
             <TextInput
+                blurOnSubmit={true}
                 keyboardType={keyboardType}
                 onChangeText={(value) => onChange(key, value)}
                 placeholder={translate(placeholderKey)}
                 placeholderTextColor={getColor('muted')}
+                returnKeyType='done'
                 selectionColor={getColor('secondary')}
                 style={styles.input}
                 value={patientInfo[key] || ''}
             />
         </View>
     );
+
+    const getCenterSuggestionStatusText = () => {
+        if (!centerSuggestionStatus || centerSuggestionStatus === 'ready') return null;
+
+        return translate(`preferredCenterStatus.${centerSuggestionStatus}`);
+    };
+
+    const renderPreferredCenterField = () => {
+        const statusText = getCenterSuggestionStatusText();
+
+        return (
+            <View style={styles.field}>
+                <Text style={styles.label}>{translate('settingsPatientPreferredCenter')}</Text>
+                <TextInput
+                    blurOnSubmit={true}
+                    onChangeText={(value) => onChange('preferredCenter', value)}
+                    placeholder={translate('settingsPatientPreferredCenterPlaceholder')}
+                    placeholderTextColor={getColor('muted')}
+                    returnKeyType='done'
+                    selectionColor={getColor('secondary')}
+                    style={styles.input}
+                    value={patientInfo.preferredCenter || ''}
+                />
+                <Text style={styles.helpText}>
+                    {translate('settingsPatientPreferredCenterHelp')}
+                </Text>
+                <TouchableOpacity
+                    accessibilityRole='button'
+                    activeOpacity={0.8}
+                    disabled={!canLoadCenterSuggestions}
+                    onPress={loadCenterSuggestions}
+                    style={styles.loadButton}
+                >
+                    {isLoadingCenterSuggestions && (
+                        <ActivityIndicator color={getColor('secondary')} size='small' />
+                    )}
+                    <Text style={styles.loadButtonText}>
+                        {translate('settingsPatientPreferredCenterLoad')}
+                    </Text>
+                </TouchableOpacity>
+                {statusText && (
+                    <Text style={styles.helpText}>{statusText}</Text>
+                )}
+                {centerSuggestions.length > 0 && (
+                    <View style={styles.suggestionList}>
+                        {centerSuggestions.map((center) => (
+                            <TouchableOpacity
+                                key={center.id}
+                                accessibilityRole='button'
+                                activeOpacity={0.8}
+                                onPress={() => onChange('preferredCenter', center.name)}
+                                style={styles.suggestion}
+                            >
+                                <Text style={styles.suggestionName}>{center.name}</Text>
+                                {Boolean(center.address) && (
+                                    <Text style={styles.suggestionAddress}>{center.address}</Text>
+                                )}
+                            </TouchableOpacity>
+                        ))}
+                    </View>
+                )}
+            </View>
+        );
+    };
 
     return (
         <>
@@ -136,11 +291,7 @@ export default function PatientInfoForm({ patientInfo, onChange }) {
                 placeholderKey: 'settingsPatientCityPlaceholder'
             })}
 
-            {renderField({
-                key: 'preferredCenter',
-                labelKey: 'settingsPatientPreferredCenter',
-                placeholderKey: 'settingsPatientPreferredCenterPlaceholder'
-            })}
+            {renderPreferredCenterField()}
         </>
     )
 }

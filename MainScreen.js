@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from 'react';
-import { View } from 'react-native';
+import { KeyboardAvoidingView, Platform, View } from 'react-native';
 import { StatusBar } from 'expo-status-bar';
 
 import BottomTabBar from './components/BottomTabBar';
@@ -45,6 +45,9 @@ export default function MainScreen() {
             flex: 1,
             backgroundColor: getColor('primary')
         },
+        keyboardArea: {
+            flex: 1
+        },
         content: {
             flex: 1
         }
@@ -53,16 +56,21 @@ export default function MainScreen() {
     return (
         <View style={styles.app}>
             <StatusBar style={settings.theme === 'dark' ? 'light' : 'dark'} />
-            {!settings.hasCompletedOnboarding ? (
-                <OnboardingScreen />
-            ) : (
-                <>
-                    <View style={styles.content}>
-                        <ActiveScreen />
-                    </View>
-                    <BottomTabBar activeTab={activeTab} onChange={setActiveTab} />
-                </>
-            )}
+            <KeyboardAvoidingView
+                behavior={Platform.OS === 'ios' ? 'padding' : undefined}
+                style={styles.keyboardArea}
+            >
+                {!settings.hasCompletedOnboarding ? (
+                    <OnboardingScreen />
+                ) : (
+                    <>
+                        <View style={styles.content}>
+                            <ActiveScreen />
+                        </View>
+                        <BottomTabBar activeTab={activeTab} onChange={setActiveTab} />
+                    </>
+                )}
+            </KeyboardAvoidingView>
         </View>
     )
 }

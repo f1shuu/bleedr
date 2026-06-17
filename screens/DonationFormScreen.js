@@ -49,7 +49,7 @@ export default function DonationFormScreen({ onBack }) {
             paddingBottom: 0
         },
         content: {
-            paddingBottom: 26
+            paddingBottom: 140
         },
         header: {
             flexDirection: 'row',
@@ -132,6 +132,8 @@ export default function DonationFormScreen({ onBack }) {
         <Container additionalStyle={styles.screen}>
             <ScrollView
                 contentContainerStyle={styles.content}
+                keyboardDismissMode='on-drag'
+                keyboardShouldPersistTaps='handled'
                 showsVerticalScrollIndicator={false}
             >
                 <View style={styles.header}>
@@ -158,9 +160,11 @@ export default function DonationFormScreen({ onBack }) {
                 <View style={styles.field}>
                     <Text style={styles.label}>{translate('donationPlace')}</Text>
                     <TextInput
+                        blurOnSubmit={true}
                         onChangeText={setPlace}
                         placeholder={translate('donationPlacePlaceholder')}
                         placeholderTextColor={getColor('muted')}
+                        returnKeyType='done'
                         selectionColor={getColor('secondary')}
                         style={styles.input}
                         value={place}
