@@ -59,7 +59,8 @@ export default function OnboardingScreen() {
         infoBox: {
             borderColor: getColor('border'),
             borderWidth: 1,
-            borderRadius: 8,
+            borderRadius: 14,
+            backgroundColor: getColor('surface'),
             padding: 14,
             marginBottom: 18
         },
@@ -70,7 +71,7 @@ export default function OnboardingScreen() {
         },
         primaryButton: {
             minHeight: 52,
-            borderRadius: 8,
+            borderRadius: 14,
             backgroundColor: getColor('secondary'),
             alignItems: 'center',
             justifyContent: 'center',

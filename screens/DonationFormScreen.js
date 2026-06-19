@@ -4,9 +4,12 @@ import { FontAwesome6 } from '@expo/vector-icons';
 import DateTimePicker from '@react-native-community/datetimepicker';
 
 import Container from '../components/Container';
+import Modal from '../components/Modal';
 import {
+    calculateNextDonationDate,
     formatDateInputValue,
     getTodayDateInputValue,
+    getSortedDonations,
     parseDateInputValue
 } from '../utils/donations';
 
@@ -17,6 +20,7 @@ export default function DonationFormScreen({ onBack }) {
     const [place, setPlace] = useState(settings.patientInfo?.preferredCenter || '');
     const [selectedDate, setSelectedDate] = useState(parseDateInputValue(getTodayDateInputValue()));
     const [isDatePickerVisible, setIsDatePickerVisible] = useState(false);
+    const [isTooEarlyModalVisible, setIsTooEarlyModalVisible] = useState(false);
 
     const handleDateChange = (event, date) => {
         if (event.type === 'dismissed') {
@@ -44,6 +48,31 @@ export default function DonationFormScreen({ onBack }) {
         onBack();
     };
 
+    const shouldWarnAboutTooEarlyDonation = () => {
+        const sortedDonations = getSortedDonations(settings.donations || []);
+        const latestDonationDate = parseDateInputValue(sortedDonations[0]?.date);
+        const nextDonationDate = calculateNextDonationDate(sortedDonations, settings.patientInfo?.sex);
+        const normalizedSelectedDate = parseDateInputValue(formatDateInputValue(selectedDate));
+
+        if (!latestDonationDate || !nextDonationDate || !normalizedSelectedDate) return false;
+
+        return normalizedSelectedDate > latestDonationDate && normalizedSelectedDate < nextDonationDate;
+    };
+
+    const handleSavePress = () => {
+        if (shouldWarnAboutTooEarlyDonation()) {
+            setIsTooEarlyModalVisible(true);
+            return;
+        }
+
+        saveDonation();
+    };
+
+    const confirmTooEarlyDonation = async () => {
+        setIsTooEarlyModalVisible(false);
+        await saveDonation();
+    };
+
     const styles = {
         screen: {
             paddingBottom: 0
@@ -63,7 +92,8 @@ export default function DonationFormScreen({ onBack }) {
             minHeight: 48,
             borderColor: getColor('border'),
             borderWidth: 1,
-            borderRadius: 8,
+            borderRadius: 14,
+            backgroundColor: getColor('surface'),
             alignItems: 'center',
             justifyContent: 'center',
             paddingVertical: 12
@@ -77,7 +107,8 @@ export default function DonationFormScreen({ onBack }) {
         intro: {
             borderColor: getColor('border'),
             borderWidth: 1,
-            borderRadius: 8,
+            borderRadius: 14,
+            backgroundColor: getColor('surface'),
             padding: 14,
             marginBottom: 18
         },
@@ -99,7 +130,8 @@ export default function DonationFormScreen({ onBack }) {
             minHeight: 48,
             borderColor: getColor('border'),
             borderWidth: 1,
-            borderRadius: 8,
+            borderRadius: 14,
+            backgroundColor: getColor('surface'),
             paddingHorizontal: 14,
             color: getColor('text'),
             fontSize: 15
@@ -113,7 +145,7 @@ export default function DonationFormScreen({ onBack }) {
         },
         primaryButton: {
             minHeight: 52,
-            borderRadius: 8,
+            borderRadius: 14,
             backgroundColor: getColor('secondary'),
             alignItems: 'center',
             justifyContent: 'center',
@@ -193,12 +225,21 @@ export default function DonationFormScreen({ onBack }) {
 
                 <TouchableOpacity
                     activeOpacity={0.8}
-                    onPress={saveDonation}
+                    onPress={handleSavePress}
                     style={styles.primaryButton}
                 >
                     <Text style={styles.primaryButtonText}>{translate('donationSave')}</Text>
                 </TouchableOpacity>
             </ScrollView>
+            <Modal
+                isVisible={isTooEarlyModalVisible}
+                text={translate('donationTooEarlyConfirm')}
+                twoButtons={true}
+                buttonOneText={translate('donationTooEarlyConfirmButton')}
+                buttonTwoText={translate('donationTooEarlyCancelButton')}
+                buttonOneOnPress={confirmTooEarlyDonation}
+                buttonTwoOnPress={() => setIsTooEarlyModalVisible(false)}
+            />
         </Container>
     )
 }

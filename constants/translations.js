@@ -6,8 +6,17 @@ export const translations = {
                 question: 'Which blood groups are compatible with mine?',
                 answer: [
                     'For red blood cell donation, compatibility is mostly about ABO and RhD. O- is the universal red cell donor, while AB+ can receive red cells from every listed group.',
-                    'Donor -> recipients: O- -> all groups; O+ -> O+, A+, B+, AB+; A- -> A-, A+, AB-, AB+; A+ -> A+, AB+; B- -> B-, B+, AB-, AB+; B+ -> B+, AB+; AB- -> AB-, AB+; AB+ -> AB+.',
                     'This is a simplified table. Before transfusion, blood is still tested and cross-matched by medical staff.'
+                ],
+                compatibilityTable: [
+                    { donor: 'O-', recipients: 'O-, O+, A-, A+, B-, B+, AB-, AB+' },
+                    { donor: 'O+', recipients: 'O+, A+, B+, AB+' },
+                    { donor: 'A-', recipients: 'A-, A+, AB-, AB+' },
+                    { donor: 'A+', recipients: 'A+, AB+' },
+                    { donor: 'B-', recipients: 'B-, B+, AB-, AB+' },
+                    { donor: 'B+', recipients: 'B+, AB+' },
+                    { donor: 'AB-', recipients: 'AB-, AB+' },
+                    { donor: 'AB+', recipients: 'AB+' }
                 ]
             },
             {
@@ -59,6 +68,10 @@ export const translations = {
                 ]
             }
         ],
+        faqCompatibilityDonor: 'Donor',
+        faqCompatibilityRecipients: 'Recipients',
+        faqSourceInfo: 'For the latest and most reliable information, visit',
+        faqSourceUrl: 'https://krwiodawcy.org/',
         homeDonationPrompt: 'Donated blood? Tap the logo above!',
         homeBloodType: 'Blood type',
         homeTotalDonated: 'Total donated',
@@ -85,6 +98,9 @@ export const translations = {
         donationDate: 'Donation date',
         donationDatePlaceholder: 'YYYY-MM-DD',
         donationSave: 'Save donation',
+        donationTooEarlyConfirm: 'The selected date is before your next eligible donation date. Are you sure you want to save this donation?',
+        donationTooEarlyConfirmButton: 'Yes',
+        donationTooEarlyCancelButton: 'No',
         deleteDonation: 'Delete donation',
         deleteDonationConfirm: 'Do you want to delete this donation?',
         deleteDonationConfirmButton: 'Delete',
@@ -118,6 +134,8 @@ export const translations = {
         settingsThemeDark: 'Dark',
         settingsThemeLight: 'Light',
         settingsLanguage: 'Language',
+        settingsSave: 'Save',
+        settingsSaved: 'Saved',
         settingsDeleteAllData: 'Delete all saved data',
         settingsDeleteAllDataConfirm: 'Are you sure you want to delete all saved data from this device?',
         settingsDeleteConfirm: 'Delete',
@@ -177,7 +195,8 @@ export const translations = {
         },
         tabFaq: 'FAQ',
         tabHome: 'Home',
-        tabSettings: 'Settings'
+        tabSettings: 'Settings',
+        version: 'Version'
     },
     pl: {
         faqTitle: 'FAQ',
@@ -186,8 +205,17 @@ export const translations = {
                 question: 'Z jakimi grupami krwi kompatybilna jest moja grupa?',
                 answer: [
                     'Dla przetaczania krwinek czerwonych najczęściej patrzy się na układ ABO i RhD. 0- jest uniwersalnym dawcą krwinek czerwonych, a AB+ może przyjąć krwinki czerwone od każdej z wymienionych grup.',
-                    'Dawca -> biorcy: 0- -> wszystkie grupy; 0+ -> 0+, A+, B+, AB+; A- -> A-, A+, AB-, AB+; A+ -> A+, AB+; B- -> B-, B+, AB-, AB+; B+ -> B+, AB+; AB- -> AB-, AB+; AB+ -> AB+.',
                     'To uproszczona tabela. Przed przetoczeniem personel medyczny i tak wykonuje badania zgodności oraz próbę krzyżową.'
+                ],
+                compatibilityTable: [
+                    { donor: '0-', recipients: '0-, 0+, A-, A+, B-, B+, AB-, AB+' },
+                    { donor: '0+', recipients: '0+, A+, B+, AB+' },
+                    { donor: 'A-', recipients: 'A-, A+, AB-, AB+' },
+                    { donor: 'A+', recipients: 'A+, AB+' },
+                    { donor: 'B-', recipients: 'B-, B+, AB-, AB+' },
+                    { donor: 'B+', recipients: 'B+, AB+' },
+                    { donor: 'AB-', recipients: 'AB-, AB+' },
+                    { donor: 'AB+', recipients: 'AB+' }
                 ]
             },
             {
@@ -239,6 +267,10 @@ export const translations = {
                 ]
             }
         ],
+        faqCompatibilityDonor: 'Dawca',
+        faqCompatibilityRecipients: 'Biorcy',
+        faqSourceInfo: 'Najświeższe i najpewniejsze informacje znajdziesz pod adresem',
+        faqSourceUrl: 'https://krwiodawcy.org/',
         homeDonationPrompt: 'Oddałeś krew? Dotknij logo u góry!',
         homeBloodType: 'Grupa krwi',
         homeTotalDonated: 'Oddano łącznie',
@@ -265,6 +297,9 @@ export const translations = {
         donationDate: 'Data donacji',
         donationDatePlaceholder: 'RRRR-MM-DD',
         donationSave: 'Zapisz donację',
+        donationTooEarlyConfirm: 'Wybrana data wypada przed najbliższym możliwym terminem oddania krwi. Czy na pewno chcesz zapisać tę donację?',
+        donationTooEarlyConfirmButton: 'Tak',
+        donationTooEarlyCancelButton: 'Nie',
         deleteDonation: 'Usuń donację',
         deleteDonationConfirm: 'Czy chcesz usunąć tę donację?',
         deleteDonationConfirmButton: 'Usuń',
@@ -298,6 +333,8 @@ export const translations = {
         settingsThemeDark: 'Ciemny',
         settingsThemeLight: 'Jasny',
         settingsLanguage: 'Język',
+        settingsSave: 'Zapisz',
+        settingsSaved: 'Zapisano',
         settingsDeleteAllData: 'Usuń wszystkie zapisane dane',
         settingsDeleteAllDataConfirm: 'Czy na pewno chcesz usunąć wszystkie zapisane dane z tego urządzenia?',
         settingsDeleteConfirm: 'Usuń',
@@ -357,6 +394,7 @@ export const translations = {
         },
         tabFaq: 'FAQ',
         tabHome: 'Panel',
-        tabSettings: 'Ustawienia'
+        tabSettings: 'Ustawienia',
+        version: 'Wersja'
     }
 }

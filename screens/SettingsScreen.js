@@ -1,20 +1,21 @@
 import { useState } from 'react';
 import { ScrollView, Switch, Text, TouchableOpacity, View } from 'react-native';
+import { FontAwesome6 } from '@expo/vector-icons';
+import { SafeAreaView } from 'react-native-safe-area-context';
 
 import Container from '../components/Container';
-import Modal from '../components/Modal';
 import PatientInfoForm from '../components/PatientInfoForm';
 import appConfig from '../app.json';
 
 import { useSettings } from '../SettingsProvider';
 
 const themeOptions = [
-    { value: 'dark', labelKey: 'settingsThemeDark' },
-    { value: 'light', labelKey: 'settingsThemeLight' }
+    { value: 'dark', labelKey: 'settingsThemeDark', iconName: 'moon' },
+    { value: 'light', labelKey: 'settingsThemeLight', iconName: 'sun' }
 ];
 const languageOptions = [
-    { value: 'pl', label: 'Polski' },
-    { value: 'en', label: 'English' }
+    { value: 'pl', label: 'Polski', flag: '🇵🇱' },
+    { value: 'en', label: 'English', flag: '🇬🇧' }
 ];
 const notificationOptions = [
     { key: 'weekBefore', labelKey: 'settingsNotificationWeekBefore' },
@@ -23,8 +24,8 @@ const notificationOptions = [
 ];
 
 export default function SettingsScreen() {
-    const [isDeleteModalVisible, setIsDeleteModalVisible] = useState(false);
-    const { clearAllData, getColor, settings, translate, updateSettings } = useSettings();
+    const [isSavedToastVisible, setIsSavedToastVisible] = useState(false);
+    const { getColor, settings, translate, updateSettings } = useSettings();
     const patientInfo = settings.patientInfo || {};
     const notificationPreferences = settings.notificationPreferences || {};
 
@@ -37,11 +38,6 @@ export default function SettingsScreen() {
         });
     };
 
-    const handleClearAllData = async () => {
-        await clearAllData();
-        setIsDeleteModalVisible(false);
-    };
-
     const updateNotificationPreference = (key, value) => {
         updateSettings({
             notificationPreferences: {
@@ -51,12 +47,51 @@ export default function SettingsScreen() {
         });
     };
 
+    const showSavedToast = () => {
+        setIsSavedToastVisible(true);
+        setTimeout(() => setIsSavedToastVisible(false), 2600);
+    };
+
     const styles = {
+        savedToastArea: {
+            position: 'absolute',
+            top: 0,
+            left: 0,
+            right: 0,
+            zIndex: 20
+        },
+        savedToast: {
+            marginHorizontal: 16,
+            marginTop: 8,
+            borderColor: getColor('secondary'),
+            borderWidth: 1,
+            borderRadius: 14,
+            backgroundColor: getColor('surface'),
+            padding: 14,
+            flexDirection: 'row',
+            alignItems: 'center',
+            gap: 12,
+            elevation: 8
+        },
+        savedIcon: {
+            width: 42,
+            height: 42,
+            borderRadius: 21,
+            borderColor: getColor('secondary'),
+            borderWidth: 1,
+            alignItems: 'center',
+            justifyContent: 'center'
+        },
+        savedText: {
+            fontFamily: 'KGRedHands',
+            fontSize: 16,
+            color: getColor('secondary')
+        },
         screen: {
             paddingBottom: 0
         },
         content: {
-            paddingBottom: 150
+            paddingBottom: 24
         },
         title: {
             fontFamily: 'KGRedHands',
@@ -72,12 +107,13 @@ export default function SettingsScreen() {
             fontFamily: 'KGRedHands',
             fontSize: 18,
             color: getColor('secondary'),
-            marginBottom: 12
+            marginBottom: 18
         },
         infoBox: {
             borderColor: getColor('border'),
             borderWidth: 1,
-            borderRadius: 8,
+            borderRadius: 14,
+            backgroundColor: getColor('surface'),
             padding: 14,
             marginBottom: 16
         },
@@ -98,25 +134,39 @@ export default function SettingsScreen() {
         optionRow: {
             flexDirection: 'row',
             flexWrap: 'wrap',
-            gap: 8
+            gap: 10
         },
         option: {
             minHeight: 42,
-            borderRadius: 8,
+            borderRadius: 14,
             borderWidth: 1,
+            flex: 1,
             paddingHorizontal: 14,
             alignItems: 'center',
-            justifyContent: 'center'
+            justifyContent: 'center',
+            backgroundColor: getColor('surface')
+        },
+        optionContent: {
+            flexDirection: 'row',
+            alignItems: 'center',
+            justifyContent: 'center',
+            gap: 8
+        },
+        flag: {
+            fontSize: 16,
+            lineHeight: 20
         },
         optionText: {
             fontFamily: 'KGRedHands',
-            fontSize: 13
+            fontSize: 13,
+            textAlign: 'center'
         },
         switchRow: {
             minHeight: 52,
             borderColor: getColor('border'),
             borderWidth: 1,
-            borderRadius: 8,
+            borderRadius: 14,
+            backgroundColor: getColor('surface'),
             paddingHorizontal: 14,
             marginBottom: 10,
             flexDirection: 'row',
@@ -130,19 +180,23 @@ export default function SettingsScreen() {
             lineHeight: 20,
             color: getColor('text')
         },
-        dangerButton: {
-            minHeight: 48,
-            borderRadius: 8,
+        saveSection: {
+            marginTop: 12,
+            paddingTop: 24
+        },
+        saveButton: {
+            minHeight: 52,
+            borderRadius: 14,
             backgroundColor: getColor('secondary'),
             alignItems: 'center',
             justifyContent: 'center',
             paddingHorizontal: 16,
-            marginTop: 6
+            marginTop: 4
         },
-        dangerButtonText: {
+        saveButtonText: {
             fontFamily: 'KGRedHands',
-            fontSize: 14,
-            color: '#FFFFFF',
+            fontSize: 15,
+            color: getColor('primary'),
             textAlign: 'center'
         },
         version: {
@@ -150,11 +204,11 @@ export default function SettingsScreen() {
             lineHeight: 16,
             color: getColor('muted'),
             textAlign: 'center',
-            marginTop: 6
+            marginTop: 16
         }
     };
 
-    const renderOption = ({ value, label, labelKey }, selectedValue, onSelect) => {
+    const renderOption = ({ value, label, labelKey, iconName, flag }, selectedValue, onSelect) => {
         const isSelected = selectedValue === value;
 
         return (
@@ -165,25 +219,51 @@ export default function SettingsScreen() {
                 style={[
                     styles.option,
                     {
-                        backgroundColor: isSelected ? getColor('secondary') : 'transparent',
+                        backgroundColor: isSelected ? getColor('secondary') : getColor('surface'),
                         borderColor: isSelected ? getColor('secondary') : getColor('border')
                     }
                 ]}
             >
-                <Text
-                    style={[
-                        styles.optionText,
-                        { color: isSelected ? getColor('primary') : getColor('text') }
-                    ]}
-                >
-                    {label || translate(labelKey)}
-                </Text>
+                <View style={styles.optionContent}>
+                    {iconName && (
+                        <FontAwesome6
+                            name={iconName}
+                            size={14}
+                            color={isSelected ? getColor('primary') : getColor('secondary')}
+                        />
+                    )}
+                    {flag && (
+                        <Text style={styles.flag}>{flag}</Text>
+                    )}
+                    <Text
+                        style={[
+                            styles.optionText,
+                            { color: isSelected ? getColor('primary') : getColor('text') }
+                        ]}
+                    >
+                        {label || translate(labelKey)}
+                    </Text>
+                </View>
             </TouchableOpacity>
         );
     };
 
     return (
         <Container additionalStyle={styles.screen}>
+            {isSavedToastVisible && (
+                <SafeAreaView edges={['top']} pointerEvents='none' style={styles.savedToastArea}>
+                    <View style={styles.savedToast}>
+                        <View style={styles.savedIcon}>
+                            <FontAwesome6
+                                name='check'
+                                size={17}
+                                color={getColor('secondary')}
+                            />
+                        </View>
+                        <Text style={styles.savedText}>{translate('settingsSaved')}</Text>
+                    </View>
+                </SafeAreaView>
+            )}
             <ScrollView
                 contentContainerStyle={styles.content}
                 keyboardDismissMode='on-drag'
@@ -248,29 +328,22 @@ export default function SettingsScreen() {
                         </View>
                     </View>
 
+                </View>
+
+                <View style={styles.saveSection}>
                     <TouchableOpacity
                         activeOpacity={0.8}
-                        onPress={() => setIsDeleteModalVisible(true)}
-                        style={styles.dangerButton}
+                        onPress={showSavedToast}
+                        style={styles.saveButton}
                     >
-                        <Text style={styles.dangerButtonText}>{translate('settingsDeleteAllData')}</Text>
+                        <Text style={styles.saveButtonText}>{translate('settingsSave')}</Text>
                     </TouchableOpacity>
                 </View>
 
                 <Text style={styles.version}>
-                    {appConfig.expo.version}
+                    {translate('version')} {appConfig.expo.version}
                 </Text>
             </ScrollView>
-
-            <Modal
-                isVisible={isDeleteModalVisible}
-                text={translate('settingsDeleteAllDataConfirm')}
-                twoButtons={true}
-                buttonOneText={translate('settingsDeleteConfirm')}
-                buttonTwoText={translate('settingsDeleteCancel')}
-                buttonOneOnPress={handleClearAllData}
-                buttonTwoOnPress={() => setIsDeleteModalVisible(false)}
-            />
         </Container>
     )
 }

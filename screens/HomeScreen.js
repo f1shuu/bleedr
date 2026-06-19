@@ -235,7 +235,8 @@ export default function HomeScreen() {
             minHeight: 82,
             borderColor: getColor('border'),
             borderWidth: 1,
-            borderRadius: 8,
+            borderRadius: 14,
+            backgroundColor: getColor('surface'),
             paddingHorizontal: 14,
             paddingVertical: 12,
             justifyContent: 'space-between'
@@ -258,7 +259,7 @@ export default function HomeScreen() {
             fontFamily: 'KGRedHands',
             fontSize: 18,
             color: getColor('secondary'),
-            marginBottom: 12
+            marginBottom: 18
         },
         historyPlace: {
             fontSize: 14,
@@ -269,7 +270,8 @@ export default function HomeScreen() {
             height: 44,
             borderColor: getColor('secondary'),
             borderWidth: 1,
-            borderRadius: 8,
+            borderRadius: 14,
+            backgroundColor: getColor('surface'),
             alignItems: 'center',
             justifyContent: 'center',
             marginTop: 2
@@ -283,7 +285,8 @@ export default function HomeScreen() {
             minHeight: 44,
             borderColor: getColor('secondary'),
             borderWidth: 1,
-            borderRadius: 8,
+            borderRadius: 14,
+            backgroundColor: getColor('surface'),
             alignItems: 'center',
             justifyContent: 'center',
             paddingHorizontal: 14,
@@ -301,7 +304,8 @@ export default function HomeScreen() {
         mapCard: {
             borderColor: getColor('border'),
             borderWidth: 1,
-            borderRadius: 8,
+            borderRadius: 14,
+            backgroundColor: getColor('surface'),
             overflow: 'hidden'
         },
         map: {

@@ -10,7 +10,8 @@ export default function DonationHistoryItem({ donation, formattedDate, onDelete 
         historyItem: {
             borderColor: getColor('border'),
             borderWidth: 1,
-            borderRadius: 8,
+            borderRadius: 14,
+            backgroundColor: getColor('surface'),
             padding: 14,
             marginBottom: 10,
             flexDirection: 'row',
@@ -36,7 +37,8 @@ export default function DonationHistoryItem({ donation, formattedDate, onDelete 
             height: 42,
             borderColor: getColor('border'),
             borderWidth: 1,
-            borderRadius: 8,
+            borderRadius: 14,
+            backgroundColor: getColor('primary'),
             alignItems: 'center',
             justifyContent: 'center'
         }

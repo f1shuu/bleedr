@@ -68,7 +68,8 @@ export default function PatientInfoForm({ patientInfo, onChange }) {
             minHeight: 48,
             borderColor: getColor('border'),
             borderWidth: 1,
-            borderRadius: 8,
+            borderRadius: 14,
+            backgroundColor: getColor('surface'),
             paddingHorizontal: 14,
             color: getColor('text'),
             fontSize: 15
@@ -82,25 +83,34 @@ export default function PatientInfoForm({ patientInfo, onChange }) {
         optionRow: {
             flexDirection: 'row',
             flexWrap: 'wrap',
-            gap: 8
+            gap: 10
         },
         option: {
             minHeight: 42,
-            borderRadius: 8,
+            borderRadius: 14,
             borderWidth: 1,
             paddingHorizontal: 14,
             alignItems: 'center',
-            justifyContent: 'center'
+            justifyContent: 'center',
+            backgroundColor: getColor('surface')
+        },
+        bloodTypeOption: {
+            width: '22.8%'
+        },
+        halfOption: {
+            flex: 1
         },
         optionText: {
             fontFamily: 'KGRedHands',
-            fontSize: 13
+            fontSize: 13,
+            textAlign: 'center'
         },
         loadButton: {
             minHeight: 44,
-            borderRadius: 8,
+            borderRadius: 14,
             borderWidth: 1,
             borderColor: canLoadCenterSuggestions ? getColor('secondary') : getColor('border'),
+            backgroundColor: getColor('surface'),
             alignItems: 'center',
             justifyContent: 'center',
             paddingHorizontal: 14,
@@ -121,7 +131,8 @@ export default function PatientInfoForm({ patientInfo, onChange }) {
         suggestion: {
             borderColor: getColor('border'),
             borderWidth: 1,
-            borderRadius: 8,
+            borderRadius: 14,
+            backgroundColor: getColor('surface'),
             padding: 12
         },
         suggestionName: {
@@ -138,7 +149,7 @@ export default function PatientInfoForm({ patientInfo, onChange }) {
         }
     };
 
-    const renderOption = ({ value, label, labelKey }, selectedValue, onSelect) => {
+    const renderOption = ({ value, label, labelKey }, selectedValue, onSelect, additionalStyle) => {
         const isSelected = selectedValue === value;
 
         return (
@@ -148,8 +159,9 @@ export default function PatientInfoForm({ patientInfo, onChange }) {
                 onPress={() => onSelect(value)}
                 style={[
                     styles.option,
+                    additionalStyle,
                     {
-                        backgroundColor: isSelected ? getColor('secondary') : 'transparent',
+                        backgroundColor: isSelected ? getColor('secondary') : getColor('surface'),
                         borderColor: isSelected ? getColor('secondary') : getColor('border')
                     }
                 ]}
@@ -256,7 +268,8 @@ export default function PatientInfoForm({ patientInfo, onChange }) {
                         renderOption(
                             { value: bloodType, label: bloodType },
                             patientInfo.bloodType,
-                            (value) => onChange('bloodType', value)
+                            (value) => onChange('bloodType', value),
+                            styles.bloodTypeOption
                         )
                     ))}
                 </View>
@@ -273,7 +286,7 @@ export default function PatientInfoForm({ patientInfo, onChange }) {
                 <Text style={styles.label}>{translate('settingsPatientSex')}</Text>
                 <View style={styles.optionRow}>
                     {sexOptions.map((option) => (
-                        renderOption(option, patientInfo.sex, (value) => onChange('sex', value))
+                        renderOption(option, patientInfo.sex, (value) => onChange('sex', value), styles.halfOption)
                     ))}
                 </View>
             </View>

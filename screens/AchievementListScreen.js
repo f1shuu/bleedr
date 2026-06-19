@@ -28,7 +28,8 @@ export default function AchievementListScreen({ achievements, onBack }) {
             height: 48,
             borderColor: getColor('border'),
             borderWidth: 1,
-            borderRadius: 8,
+            borderRadius: 14,
+            backgroundColor: getColor('surface'),
             alignItems: 'center',
             justifyContent: 'center',
             paddingVertical: 12

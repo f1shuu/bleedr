@@ -13,7 +13,8 @@ export default function AchievementItem({ achievement }) {
         item: {
             borderColor: achievement.isUnlocked ? accentColor : getColor('border'),
             borderWidth: 1,
-            borderRadius: 8,
+            borderRadius: 14,
+            backgroundColor: getColor('surface'),
             padding: 14,
             marginBottom: 10,
             flexDirection: 'row',
